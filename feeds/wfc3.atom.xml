@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>The Other Side of the Screen</title><link href="/" rel="alternate"></link><link href="/feeds/wfc3.atom.xml" rel="self"></link><id>/</id><updated>2013-11-18T00:00:00-05:00</updated><entry><title>The Moving Target Pipeline</title><link href="/posts/2013/11/18/2013-11-17-mtpipeline-ddrf/" rel="alternate"></link><updated>2013-11-18T00:00:00-05:00</updated><author><name>Alex C. Viana</name></author><id>tag:,2013-11-18:posts/2013/11/18/2013-11-17-mtpipeline-ddrf/</id><summary type="html">&lt;p&gt;A few weeks ago I was awarded an research grant to continue working on a prototype software pipeline for HST moving target (solar system) observations. The grant came from an internal source called the Director's Discretionary Research Fund (DDRF). My project, called the Moving Target Pipeline, was fully funded at $21,000 and allows me to buy back 25% of my time for one year to work on the project. Here is the proposal abstract:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;"We propose a moving target pipeline for the WFC3 and ACS instruments based our existing WFPC2 software to produce properly drizzled FITS images, dynamically scaled preview images, and predicted ephemeris positions. Such a pipeline is relevant to ongoing HST scientific observations, the Hubble Legacy Archive (HLA), and serves to lay the design groundwork for JWST’s moving target processing. We request funds to support a senior RIA for our software development activities. &lt;sup id="fnref:1"&gt;&lt;a class="footnote-ref" href="#fn:1" rel="footnote"&gt;1&lt;/a&gt;&lt;/sup&gt;"&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Continuing from the proposal:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;"Our WFPC2 pipeline addresses the 4 main issues that impede performing Solar System astronomy with HST archival data: (1) identifying cosmic rays, (2) drizzling, (3) scaled preview images, and (4) identifying incidental ephemeris observations."&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This image gives an attractive visual of what we can already accomplish for WFPC2 data and will expand to the WFC3 and ACS cameras:&lt;/p&gt;
+&lt;p&gt;&lt;img style="width: 800px; max-width: 100%; height: auto;" alt="Oops, something broke." src="/images/mtpipeline-mars-before-after.png" /&gt;&lt;/p&gt;
+&lt;p&gt;You can find the full proposal &lt;a href="https://www.dropbox.com/s/04m5rboqkkmzuvm/2013_Fall_DDRF_Proposal_No_Recs.pdf"&gt;here&lt;/a&gt;. Our project will be open source and available on GitHub. It will be an extension of our existing work on a citizen science project for WFPC2 which you can browse &lt;a href="" title="https://github.com/STScI-Citizen-Science/MTPipeline"&gt;here&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;I hope that our work will be useful for planetary scientists using HST.&lt;/p&gt;
+&lt;div class="footnote"&gt;
+&lt;hr /&gt;
+&lt;ol&gt;
+&lt;li id="fn:1"&gt;
+&lt;p&gt;Full disclosure, I misspelled "activities" in the actual abstract. &lt;em&gt;facepalm&lt;/em&gt;&amp;#160;&lt;a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</summary><category term="mtpipeline"></category><category term="milestones"></category><category term="wfc3"></category><category term="acs"></category><category term="hst"></category><category term="jwst"></category></entry></feed>
