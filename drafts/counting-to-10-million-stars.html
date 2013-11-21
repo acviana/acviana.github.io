@@ -4,7 +4,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>The Other Side of the Screen - milestones</title>
+  <title>Counting to 10 Million Stars</title>
   <meta name="author" content="Alex C. Viana">
 
 
@@ -52,30 +52,43 @@
 </ul></nav>
   <div id="main">
     <div id="content">
-<div class="blog-index">
-  		<article>
+<div>
+  <article class="hentry" role="article">
 <header>
-      <h1 class="entry-title">
-        <a href="/posts/2013/11/18/mtpipeline-ddrf/">The Moving Target Pipeline</a>
-      </h1>
+      <h1 class="entry-title">Counting to 10 Million Stars</h1>
       <p class="meta"><time datetime="2013-11-18T00:00:00" pubdate>2013-11-18</time></p>
 </header>
 
-  <div class="entry-content"><p>A few weeks ago I was awarded an research grant to continue working on a prototype software pipeline for HST moving target (solar system) observations. The grant came from an internal source called the Director's Discretionary Research Fund (DDRF). My project, called the Moving Target Pipeline, was fully funded ...</p></div>
-  <footer>
-    <a rel="full-article" href="/posts/2013/11/18/mtpipeline-ddrf/">Read On &crarr;</a>
-  </footer>
-  		</article>
-<div class="pagination">
+  <div class="entry-content"><p>I am working on a new project with my largest dataset yet. It's an exciting project because it is pushing me more in the direction of "Big Data". That term means different things to different people, personally I consider something to be Big Data when the complexity of working with the data (storing, organizing, retrieving, visualizing) is at least the same order of difficulty as the calculations you want to perform, in terms of man-hours. </p>
+<p>The dataset for this project is comprised of essentially all the on-orbit observations taken with the HST WFC3 UVIS instrument. The total dataset size is roughly 10 million <a href="http://en.wikipedia.org/wiki/Point_spread_function">PSFs</a>. Each observation is an 11x11 array data mined from images using a colleague's specialized FORTRAN code. This is an especially powerful method of constructing our dataset because it allows us to use any incidental PSFs observations when the target was not a star or stellar field.</p>
+<p><img style="width: 800px; max-width: 100%; height: auto;" alt="Oops, something broke." src="/images/psf-4-panel-view.png" /></p>
+<p>This is one of the difficult aspects of the type of scientific programming I do. The software I write is exploratory on nature so by design large sections have to be rewritten. fdf</p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">Alex C. Viana</span>
+  </span>
+<time datetime="2013-11-18T00:00:00" pubdate>2013-11-18</time>  <span class="categories">
+    <a class="category" href="/tag/wfc3.html">wfc3</a>
+    <a class="category" href="/tag/psf.html">psf</a>
+    <a class="category" href="/tag/uvis.html">uvis</a>
+  </span>
+</p>    </footer>
+  </article>
 
-  <br />
-</div></div>
+</div>
 <aside class="sidebar">
   <section>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="/posts/2013/11/21/the-data-is-inconclusive/">The Data is Inconclusive</a>
+      </li>
+      <li class="post">
           <a href="/posts/2013/11/18/mtpipeline-ddrf/">The Moving Target Pipeline</a>
+      </li>
+      <li class="post">
+          <a href="/posts/2013/11/17/the-trouble-with-tech-blogs/">The Trouble with Tech Blogs</a>
       </li>
     </ul>
   </section>
