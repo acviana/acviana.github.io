@@ -59,16 +59,16 @@
       <p class="meta"><time datetime="2013-11-20T00:00:00" pubdate>2013-11-20</time></p>
 </header>
 
-  <div class="entry-content"><p>In my last post on my PSF Project I characterized the the PSF shape using two orthogonal 1-D Guassians. Now I start to characterize images with thousands of stars in them. </p>
+  <div class="entry-content"><p>In my last post on my PSF Project I characterized the PSF shape by fitting a 1-D Gaussian to the a row and column slice through the central pixel. In this post I start to think about how to characterize entire images with thousands of stars.</p>
 <h3>Adding Some Zeros</h3>
-<p>One of the applications of this project is studying the telescope focus over time. One way to do this is to move from characterizing individual PSFs to characterizing the PSFs in an entire image and seeing how that changes over time. <sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup> In other words we need to add some zeros to our lone star and start working our way towards our final dataset of 10 million. I decided to do this by digging into the first stellar field I could find. This happened to be <code>iabj01a2q_flt.fits</code> an image of <a href="http://en.wikipedia.org/wiki/47_Tucanae">NGC104</a> which adds 3 more zeros to our star total, bringing it to roughly 1,500 stars. Here is the image, it's actually quite nice (sorry for the large file):</p>
+<p>Many applications for the PSF database involve looking at PSF changes over a time series. One way to do this is to move from characterizing individual PSFs to characterizing the PSFs in an entire image and seeing how that changes over time. <sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup> In other words, we need to add some zeros to our lone star and start working our way towards our final dataset of 10 million. I decided to do this by digging into the first stellar field I could find. This happened to be <code>iabj01a2q_flt.fits</code> an image of <a href="http://en.wikipedia.org/wiki/47_Tucanae">NGC104</a> which adds 3 more zeros to our star total, bringing it to roughly 1,500 stars. Here is the image, it's actually quite nice (sorry for the large file):</p>
 <p><img style="width: 800px; max-width: 100%; height: auto;" alt="Oops, something broke." src="/images/Visit01-iabj01a2q_flt.jpg" /></p>
 <p>In case you want to play along at home, this image is in the public domain and can be found <a href="http://archive.stsci.edu/cgi-bin/mastpreview?mission=hst&amp;dataid=IABJ01A2Q">here</a>. </p>
 <h3>Plotting the PSF Fits</h3>
 <p>So I went ahead and fitted a Gaussian in both the row and column directions for all the stars in that image. Then I studied the distribution by plotting the fit parameters against each other in each slice.</p>
 <p><img style="width: 800px; max-width: 100%; height: auto;" alt="Oops, something broke." src="/images/image_variable_matrix.png" /></p>
 <p>First of all, in hindsight what I wanted was a <a href="https://www.google.com/webhp#q=scatter%20plot%20matrix">scatter plot matrix</a> but this is exploratory work so I can go back and make that plot in the future.</p>
-<p>In terms of the actual data, we don't see anything noticeably different between the row and column slices, which is expected at this point, though there there may be directionally-dependent instrumental effects, such as the charge transfer efficiency, which may come into play later. Looking at the individual fit parameters there's not much going on with the amplitude but things get interesting when we plot the standard deviation against the mean (mu). However, the correlation we're seeing in the plot is actually a sampling effect. </p>
+<p>In terms of the actual data, we don't see anything noticeably different between the row and column slices, which is expected at this point, though there there may be directionally-dependent instrumental effects, such as the charge transfer efficiency, which may come into play later. Looking at the individual fit parameters there's not much going on with the amplitude but things get interesting when we plot the standard deviation against the mean (<code>mu</code>). However, the correlation we're seeing in the plot is actually a sampling effect. </p>
 <h3>Interpreting the Results</h3>
 <p>Let's start by explaining what <code>sigma</code> and <code>mu</code> mean in this context (it might be helpful to refer to my <a href="http://acviana.github.io/posts/2013/11/18/counting-to-10-million-stars/">last post</a>). First of all, <code>mu</code>, the mean of the Gaussian fit is almost always between 4.5 and 5.5. This is by design because the algorithm that centers the PSF cutouts does a good job of picking the brightest pixel. <code>sigma</code> then is a measure of the width of the PSF. </p>
 <p>The actual energy distribution of a star is a continuous distribution. However, detectors take discrete samples from this distribution, pretty much literally making a histogram. If you've played around with histograms much you might see where this is going. If a star happens to land exactly in the middle of a pixel (<code>mu</code> = 5) most of the light from the PSF will land in that pixel. This will result in a narrow <code>sigma</code>. But is the <em>same</em> PSF lands right in the middle of two pixels (equidistant from their centers) then the same amount of flux is split between those two pixels. The total amount of flux is still the same, but the distribution is different. This distribution is less peaked, which is to say wider and with a larger <code>sigma</code>. </p>
@@ -104,6 +104,9 @@
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="/posts/2013/11/23/a-basic-automation-setup/">A Basic Automation Setup for Astronomy: Part 1</a>
+      </li>
+      <li class="post">
           <a href="/posts/2013/11/21/the-data-are-inconclusive/">The Data are Inconclusive</a>
       </li>
       <li class="post">
@@ -114,9 +117,6 @@
       </li>
       <li class="post">
           <a href="/posts/2013/11/18/mtpipeline-ddrf/">The Moving Target Pipeline</a>
-      </li>
-      <li class="post">
-          <a href="/posts/2013/11/17/the-trouble-with-tech-blogs/">The Trouble with Tech Blogs</a>
       </li>
     </ul>
   </section>
@@ -131,7 +131,7 @@
 
   <section>
   <h1>Tags</h1>
-    <a href="/tag/uvis.html">uvis</a>,    <a href="/tag/code.html">code</a>,    <a href="/tag/mtpipeline.html">mtpipeline</a>,    <a href="/tag/jwst.html">jwst</a>,    <a href="/tag/wfc3.html">wfc3</a>,    <a href="/tag/psf.html">psf</a>,    <a href="/tag/wfpc2.html">wfpc2</a>,    <a href="/tag/acs.html">acs</a>,    <a href="/tag/milestones.html">milestones</a>,    <a href="/tag/hst.html">hst</a>,    <a href="/tag/plots.html">plots</a>,    <a href="/tag/pelican.html">pelican</a>  </section>
+    <a href="/tag/uvis.html">uvis</a>,    <a href="/tag/code.html">code</a>,    <a href="/tag/mtpipeline.html">mtpipeline</a>,    <a href="/tag/python.html">python</a>,    <a href="/tag/wfc3.html">wfc3</a>,    <a href="/tag/psf.html">psf</a>,    <a href="/tag/devops.html">devops</a>,    <a href="/tag/wfpc2.html">wfpc2</a>,    <a href="/tag/acs.html">acs</a>,    <a href="/tag/jwst.html">jwst</a>,    <a href="/tag/milestones.html">milestones</a>,    <a href="/tag/hst.html">hst</a>,    <a href="/tag/plots.html">plots</a>,    <a href="/tag/pelican.html">pelican</a>  </section>
 
 
     <section>
