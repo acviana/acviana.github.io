@@ -14,12 +14,12 @@
   <meta name="MobileOptimized" content="320">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link href="http://acviana.github.io/favicon.png" rel="icon">
-  <link href="http://acviana.github.io/theme/css/main.css" media="screen, projection"
+  <link href="/favicon.png" rel="icon">
+  <link href="/theme/css/main.css" media="screen, projection"
         rel="stylesheet" type="text/css">
-  <script src="http://acviana.github.io/theme/js/modernizr-2.0.js"></script>
-  <script src="http://acviana.github.io/theme/js/ender.js"></script>
-  <script src="http://acviana.github.io/theme/js/octopress.js" type="text/javascript"></script>
+  <script src="/theme/js/modernizr-2.0.js"></script>
+  <script src="/theme/js/ender.js"></script>
+  <script src="/theme/js/octopress.js" type="text/javascript"></script>
 
   <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
         rel="stylesheet" type="text/css">
@@ -29,25 +29,25 @@
 
 <body>
   <header role="banner"><hgroup>
-  <h1><a href="http://acviana.github.io/">The Other Side of the Screen</a></h1>
+  <h1><a href="/">The Other Side of the Screen</a></h1>
     <h2>"On the other side of the screen it all seems so easy." - Tron (1982)</h2>
 </hgroup></header>
   <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="http://acviana.github.io/" rel="subscribe-rss">RSS</a></li>
+  <li><a href="/" rel="subscribe-rss">RSS</a></li>
 </ul>
 
 <!-- TODO: add search here
 <form action="" method="get">
   <fieldset role="search">
-    <input type="hidden" name="q" value="site:http://acviana.github.io" />
+    <input type="hidden" name="q" value="site:" />
     <input class="search" type="text" name="q" results="0" placeholder="Search"/>
   </fieldset>
 </form>
 -->
 
 <ul class="main-navigation">
-      <li><a href="http://acviana.github.io/pages/about.html">About</a></li>
-      <li><a href="http://acviana.github.io/pages/disclaimer.html">Disclaimer</a></li>
+      <li><a href="/pages/about.html">About</a></li>
+      <li><a href="/pages/disclaimer.html">Disclaimer</a></li>
     <!-- TODO: add categories here? -->
 </ul></nav>
   <div id="main">
@@ -59,8 +59,8 @@
       <p class="meta"><time datetime="2013-11-23T00:00:00" pubdate>2013-11-23</time></p>
 </header>
 
-  <div class="entry-content"><h3>Python: Wrapping and Logging Your Code</h3>
-<p>You may have noticed that we've only been talking about Python so far but I started this post by saying that this setup can execute -ANY- software, and it can. We're just going to warp it in Python first.</p>
+  <div class="entry-content"><p>You may have noticed that we've only been talking about Python so far but I started this post by saying that this setup can execute -ANY- software, and it can. We're just going to warp it in Python first.</p>
+<h3>Python: Wrapping and Logging Your Code</h3>
 <p>Python has a great <a href="http://docs.python.org/2/library/logging.html">logging</a> module. <em>Please</em> don't write your own. I know you're thinking, <em>"Oh that's just writing to a file, I can code that up myself ..."</em>. Don't it's way better than what you would make.</p>
 <p>Here is an example output from one of my scripts:</p>
 <div class="highlight"><pre><span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="p">:</span><span class="mi">08</span><span class="p">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">719</span> <span class="o">-</span> <span class="n">jpl2db</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">User:</span> <span class="n">jstrummer</span>
@@ -75,16 +75,44 @@
 </pre></div>
 
 
-<p>With the command line <code>grep</code> utility you can quickly start to look for trends. If you want to do even more you can explore the Pandas Python package, more on that in a later post. </p></div>
+<p>With the command line <code>grep</code> utility you can quickly start to look for trends. If you want to do even more you can explore the Pandas Python package, more on that in a later post. </p>
+<div class="highlight"><pre><span class="n">def</span> <span class="n">log_info</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="s">&quot;&quot;&quot;Decorator to log some useful environment information.&quot;&quot;&quot;</span>
+    <span class="n">def</span> <span class="n">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+
+        <span class="c1"># Log user, system, and Python metadata</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;User: &#39;</span> <span class="o">+</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">())</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;System: &#39;</span> <span class="o">+</span> <span class="nb">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Python Version: &#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;\n&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Python Executable Path: &#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">)</span>
+
+        <span class="c1"># Log PyRAF data</span>
+        <span class="n">try:</span>
+            <span class="nb">import</span> <span class="n">pyraf</span>
+            <span class="n">from</span> <span class="n">pyraf</span> <span class="nb">import</span> <span class="n">iraf</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;PyRAF Version: &#39;</span> <span class="o">+</span> <span class="n">pyraf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;PyRAF Path: &#39;</span> <span class="o">+</span> <span class="n">pyraf</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">except</span> <span class="n">ImportError</span> <span class="n">as</span> <span class="n">err:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">err</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="c1"># Call the function and log the execution time.</span>
+        <span class="n">t1_time</span> <span class="o">=</span> <span class="nb">time</span><span class="o">.</span><span class="nb">time</span><span class="p">()</span>
+        <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+        <span class="n">t2_time</span> <span class="o">=</span> <span class="nb">time</span><span class="o">.</span><span class="nb">time</span><span class="p">()</span>
+        <span class="n">hours_time</span><span class="p">,</span> <span class="n">remainder_time</span> <span class="o">=</span> <span class="n">divmod</span><span class="p">(</span><span class="n">t2_time</span> <span class="o">-</span> <span class="n">t1_time</span><span class="p">,</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">minutes_time</span><span class="p">,</span> <span class="n">seconds_time</span> <span class="o">=</span> <span class="n">divmod</span><span class="p">(</span><span class="n">remainder_time</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Elapsed Real Time: {0:.0f}:{1:.0f}:{2:f}&#39;</span><span class="o">.</span><span class="nb">format</span><span class="p">(</span><span class="n">hours_time</span><span class="p">,</span> <span class="n">minutes_time</span><span class="p">,</span> <span class="n">seconds_time</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">wrapped</span>
+</pre></div></div>
     <footer>
 <p class="meta">
   <span class="byline author vcard">
     Posted by <span class="fn">Alex C. Viana</span>
   </span>
 <time datetime="2013-11-23T00:00:00" pubdate>2013-11-23</time>  <span class="categories">
-    <a class="category" href="http://acviana.github.io/tag/code.html">code</a>
-    <a class="category" href="http://acviana.github.io/tag/devops.html">devops</a>
-    <a class="category" href="http://acviana.github.io/tag/python.html">python</a>
+    <a class="category" href="/tag/code.html">code</a>
+    <a class="category" href="/tag/devops.html">devops</a>
+    <a class="category" href="/tag/python.html">python</a>
   </span>
 </p>    </footer>
   </article>
@@ -95,19 +123,19 @@
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
-          <a href="http://acviana.github.io/posts/2013/11/23/a-basic-automation-setup/">A Basic Automation Setup for Astronomy: Part 1</a>
+          <a href="/posts/2013/11/23/a-basic-automation-setup/">A Basic Automation Setup for Astronomy: Part 1</a>
       </li>
       <li class="post">
-          <a href="http://acviana.github.io/posts/2013/11/21/the-data-are-inconclusive/">The Data are Inconclusive</a>
+          <a href="/posts/2013/11/21/the-data-are-inconclusive/">The Data are Inconclusive</a>
       </li>
       <li class="post">
-          <a href="http://acviana.github.io/posts/2013/11/20/the-first-thousand-psfs/">The First Thousand PSFs</a>
+          <a href="/posts/2013/11/20/the-first-thousand-psfs/">The First Thousand PSFs</a>
       </li>
       <li class="post">
-          <a href="http://acviana.github.io/posts/2013/11/18/counting-to-10-million-stars/">Counting to 10 Million Stars</a>
+          <a href="/posts/2013/11/18/counting-to-10-million-stars/">Counting to 10 Million Stars</a>
       </li>
       <li class="post">
-          <a href="http://acviana.github.io/posts/2013/11/18/mtpipeline-ddrf/">The Moving Target Pipeline</a>
+          <a href="/posts/2013/11/18/mtpipeline-ddrf/">The Moving Target Pipeline</a>
       </li>
     </ul>
   </section>
@@ -115,20 +143,20 @@
       
     <h1>Categories</h1>
     <ul id="recent_posts">
-        <li><a href="http://acviana.github.io/category/work.html">Work</a></li>
+        <li><a href="/category/work.html">Work</a></li>
     </ul>
   </section>
  
 
   <section>
   <h1>Tags</h1>
-    <a href="http://acviana.github.io/tag/uvis.html">uvis</a>,    <a href="http://acviana.github.io/tag/code.html">code</a>,    <a href="http://acviana.github.io/tag/mtpipeline.html">mtpipeline</a>,    <a href="http://acviana.github.io/tag/python.html">python</a>,    <a href="http://acviana.github.io/tag/wfc3.html">wfc3</a>,    <a href="http://acviana.github.io/tag/psf.html">psf</a>,    <a href="http://acviana.github.io/tag/devops.html">devops</a>,    <a href="http://acviana.github.io/tag/wfpc2.html">wfpc2</a>,    <a href="http://acviana.github.io/tag/acs.html">acs</a>,    <a href="http://acviana.github.io/tag/jwst.html">jwst</a>,    <a href="http://acviana.github.io/tag/milestones.html">milestones</a>,    <a href="http://acviana.github.io/tag/hst.html">hst</a>,    <a href="http://acviana.github.io/tag/plots.html">plots</a>,    <a href="http://acviana.github.io/tag/pelican.html">pelican</a>  </section>
+    <a href="/tag/uvis.html">uvis</a>,    <a href="/tag/code.html">code</a>,    <a href="/tag/mtpipeline.html">mtpipeline</a>,    <a href="/tag/python.html">python</a>,    <a href="/tag/wfc3.html">wfc3</a>,    <a href="/tag/psf.html">psf</a>,    <a href="/tag/devops.html">devops</a>,    <a href="/tag/wfpc2.html">wfpc2</a>,    <a href="/tag/acs.html">acs</a>,    <a href="/tag/jwst.html">jwst</a>,    <a href="/tag/milestones.html">milestones</a>,    <a href="/tag/hst.html">hst</a>,    <a href="/tag/plots.html">plots</a>,    <a href="/tag/pelican.html">pelican</a>  </section>
 
 
     <section>
         <h1>Social</h2>
         <ul>
-            <li><a href="http://acviana.github.io/" type="application/rss+xml" rel="alternate">RSS</a></li>
+            <li><a href="/" type="application/rss+xml" rel="alternate">RSS</a></li>
             <li><a href="https://twitter.com/AlexVianaPro" target="_blank">Twitter</a></li>
             <li><a href="https://github.com/acviana" target="_blank">GitHub</a></li>
             <li><a href="http://www.linkedin.com/pub/alex-viana/49/1b8/83" target="_blank">LinkedIn</a></li>
