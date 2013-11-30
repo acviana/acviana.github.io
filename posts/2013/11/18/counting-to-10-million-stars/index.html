@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Counting to 10 Million Stars</title>
+  <meta name="author" content="Alex C. Viana">
+
+
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="http://acviana.github.io/favicon.png" rel="icon">
+  <link href="http://acviana.github.io/theme/css/main.css" media="screen, projection"
+        rel="stylesheet" type="text/css">
+  <script src="http://acviana.github.io/theme/js/modernizr-2.0.js"></script>
+  <script src="http://acviana.github.io/theme/js/ender.js"></script>
+  <script src="http://acviana.github.io/theme/js/octopress.js" type="text/javascript"></script>
+
+  <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
+        rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <header role="banner"><hgroup>
+  <h1><a href="http://acviana.github.io/">The Other Side of the Screen</a></h1>
+    <h2>"On the other side of the screen it all seems so easy." - Tron (1982)</h2>
+</hgroup></header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="http://acviana.github.io/" rel="subscribe-rss">RSS</a></li>
+</ul>
+
+<!-- TODO: add search here
+<form action="" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:http://acviana.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+-->
+
+<ul class="main-navigation">
+      <li><a href="http://acviana.github.io/pages/about.html">About</a></li>
+      <li><a href="http://acviana.github.io/pages/disclaimer.html">Disclaimer</a></li>
+    <!-- TODO: add categories here? -->
+</ul></nav>
+  <div id="main">
+    <div id="content">
+<div>
+  <article class="hentry" role="article">
+<header>
+      <h1 class="entry-title">Counting to 10 Million Stars</h1>
+      <p class="meta"><time datetime="2013-11-18T00:00:00" pubdate>2013-11-18</time></p>
+</header>
+
+  <div class="entry-content"><p>I've started a new project working with 10 million stellar PSFs. In my first few steps in the project I performed some model fitting and made a pretty visualization of the individual data points.</p>
+<h3>My New (Little) Big Data Project</h3>
+<p>I am starting a new project that I'm pretty excited, it's one of the reasons I decided to start this blog. about because it is pushing me more in the direction of "Big Data". Lots of people throw the term big data around with different meanings. Personally, I consider something to be Big Data when the complexity of the task is dominated by complications from the size of the data. The "task" could be anything related to the data including storage, computation, or visualization. Specifically, this project is going to push the computation and database aspects of my work into the Big Data zone.</p>
+<p>The dataset for this project is 10 million stellar <a href="http://en.wikipedia.org/wiki/Point_spread_function">PSFs</a> observations taken with the HST WFC3 UVIS instrument. These PSF were data mined from the total on-orbit data set of roughly 35 thousand WFC3 UVIS observations using a colleague's specialized FORTRAN code which extracted a 11x11 array centered on each PSF. This is an especially powerful method of constructing our dataset because it allows us to use any incidental PSFs observations when the target was not a star or stellar field.</p>
+<h3>Fitting 1-D Gaussian Distributions</h3>
+<p>After some initial work I was able to create a reader that takes the outputs text files from my colleague's code and transforms it into a numpy array. Next, we decided we wanted to start by characterizing the PSFs with two 1-D Gaussian fits through the center pixel, one in the row direction and another in the column.</p>
+<p>First of all, I was <em>shocked</em> to learn, after an hour of googling and popping my head into people's offices, that the definition of a Gaussian distribution isn't tucked away somewhere in NumPy or SciPy. Thinking about it, it <em>guess</em> makes sense because it's not clear what format your inputs and outputs should be, but I'm still a little surprised that all the tutorials I found on this subject began with defining the Gaussian distribution. Anyway, once I got past that the rest wasn't too hard. </p>
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
+
+
+<span class="k">def</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Definintion of the Guassian function.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">A</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">mu</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mf">2.</span><span class="o">*</span><span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">get_gaussian_dict</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Use curve fit to return a dictionary with all the model </span>
+<span class="sd">    information.&quot;&quot;&quot;</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">data</span> <span class="o">==</span> <span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">())[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">coeff</span><span class="p">,</span> <span class="n">var_matrix</span> <span class="o">=</span> <span class="n">curve_fit</span><span class="p">(</span><span class="n">gaussian</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)),</span> <span class="n">data</span><span class="p">,</span> <span class="n">p0</span><span class="p">)</span>
+    <span class="n">A</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="n">coeff</span>
+    <span class="n">output_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">output_dict</span><span class="p">[</span><span class="s">&#39;amplitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="n">output_dict</span><span class="p">[</span><span class="s">&#39;mu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+    <span class="n">output_dict</span><span class="p">[</span><span class="s">&#39;sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+    <span class="n">output_dict</span><span class="p">[</span><span class="s">&#39;var_matrix&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_matrix</span>
+    <span class="n">output_dict</span><span class="p">[</span><span class="s">&#39;model_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gaussian</span><span class="p">(</span><span class="n">resample_range</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">A</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output_dict</span>
+</pre></div>
+
+
+<p>I use scipy's impressive <code>curve_fit</code> function to perform the model fitting. The last argument <code>curve_fit</code> takes is <code>p0</code>, the initial guess for the fitting parameters. Fortunately, our data is very well behaved so we can easily do a good job guessing the initial parameters from the input data. Because I like to make my functions as general as possible I return all the possible information from the fit in a dictionary. For example, in the future I'll probably want to dig into the <a href="http://en.wikipedia.org/wiki/Covariance_matrix">covariance matrix</a> that the <code>curve_fit</code> returns to calculate a goodness of fit estimator and I'll be able to do that with the same function. </p>
+<h3>Eye Candy</h3>
+<p>Finally, all this is all visualized in the 4-panel figure below.</p>
+<p><img style="width: 800px; max-width: 100%; height: auto;" alt="Oops, something broke." src="/images/psf-4-panel-view.png" /></p>
+<p>The bottom row contains the row and column slices and the Gaussian fits with the model parameters printed in the upper corners. The upper row contains a heat map, and just for fun, a 3D wire frame for the PSF. I could make some tweaks here and there such as matching the wire frame and heat map color bars but this is already more than enough to visualize a single data point, I need to start working my way up to 10 million.</p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">Alex C. Viana</span>
+  </span>
+<time datetime="2013-11-18T00:00:00" pubdate>2013-11-18</time>  <span class="categories">
+    <a class="category" href="http://acviana.github.io/tag/wfc3.html">wfc3</a>
+    <a class="category" href="http://acviana.github.io/tag/psf.html">psf</a>
+    <a class="category" href="http://acviana.github.io/tag/uvis.html">uvis</a>
+    <a class="category" href="http://acviana.github.io/tag/plots.html">plots</a>
+    <a class="category" href="http://acviana.github.io/tag/code.html">code</a>
+    <a class="category" href="http://acviana.github.io/tag/python.html">python</a>
+  </span>
+</p>    </footer>
+  </article>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
+<aside class="sidebar">
+  <section>
+    <h1>Recent Posts</h1>
+    <ul id="recent_posts">
+      <li class="post">
+          <a href="http://acviana.github.io/posts/2013/11/23/a-basic-automation-setup/">A Basic Automation Setup for Astronomy: Part 1</a>
+      </li>
+      <li class="post">
+          <a href="http://acviana.github.io/posts/2013/11/21/the-data-are-inconclusive/">The Data are Inconclusive</a>
+      </li>
+      <li class="post">
+          <a href="http://acviana.github.io/posts/2013/11/20/the-first-thousand-psfs/">The First Thousand PSFs</a>
+      </li>
+      <li class="post">
+          <a href="http://acviana.github.io/posts/2013/11/18/counting-to-10-million-stars/">Counting to 10 Million Stars</a>
+      </li>
+      <li class="post">
+          <a href="http://acviana.github.io/posts/2013/11/18/mtpipeline-ddrf/">The Moving Target Pipeline</a>
+      </li>
+    </ul>
+  </section>
+  <section>
+      
+    <h1>Categories</h1>
+    <ul id="recent_posts">
+        <li><a href="http://acviana.github.io/category/work.html">Work</a></li>
+    </ul>
+  </section>
+ 
+
+  <section>
+  <h1>Tags</h1>
+    <a href="http://acviana.github.io/tag/uvis.html">uvis</a>,    <a href="http://acviana.github.io/tag/code.html">code</a>,    <a href="http://acviana.github.io/tag/mtpipeline.html">mtpipeline</a>,    <a href="http://acviana.github.io/tag/python.html">python</a>,    <a href="http://acviana.github.io/tag/wfc3.html">wfc3</a>,    <a href="http://acviana.github.io/tag/psf.html">psf</a>,    <a href="http://acviana.github.io/tag/devops.html">devops</a>,    <a href="http://acviana.github.io/tag/wfpc2.html">wfpc2</a>,    <a href="http://acviana.github.io/tag/acs.html">acs</a>,    <a href="http://acviana.github.io/tag/jwst.html">jwst</a>,    <a href="http://acviana.github.io/tag/milestones.html">milestones</a>,    <a href="http://acviana.github.io/tag/hst.html">hst</a>,    <a href="http://acviana.github.io/tag/plots.html">plots</a>,    <a href="http://acviana.github.io/tag/pelican.html">pelican</a>  </section>
+
+
+    <section>
+        <h1>Social</h2>
+        <ul>
+            <li><a href="http://acviana.github.io/" type="application/rss+xml" rel="alternate">RSS</a></li>
+            <li><a href="https://twitter.com/AlexVianaPro" target="_blank">Twitter</a></li>
+            <li><a href="https://github.com/acviana" target="_blank">GitHub</a></li>
+            <li><a href="http://www.linkedin.com/pub/alex-viana/49/1b8/83" target="_blank">LinkedIn</a></li>
+            <li><a href="http://stackoverflow.com/users/1216837/acv" target="_blank">StackOverflow</a></li>
+        </ul>
+    </section>
+    <section>
+        <h1>Blogroll</h2>
+        <ul>
+            <li><a href="http://getpelican.com/" target="_blank">Pelican</a></li>
+            <li><a href="http://python.org/" target="_blank">Python.org</a></li>
+            <li><a href="http://jinja.pocoo.org/" target="_blank">Jinja2</a></li>
+            <li><a href="http://software-carpentry.org/" target="_blank">Software Carpentry</a></li>
+        </ul>
+    </section>
+</aside>    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Alex C. Viana -
+  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
+</p></footer>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-45960611-1']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-45960611-1');
+    ga('send', 'pageview');
+</script>
+	<script type="text/javascript">
+	  var disqus_shortname = 'theothersideofthescreen';
+          var disqus_identifier = '/posts/2013/11/18/counting-to-10-million-stars/';
+          var disqus_url = 'http://acviana.github.io/posts/2013/11/18/counting-to-10-million-stars/';
+          var disqus_title = 'Counting to 10 Million Stars';
+	  (function() {
+	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+	    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+	    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+	   })();
+	</script>
+</body>
+</html>
