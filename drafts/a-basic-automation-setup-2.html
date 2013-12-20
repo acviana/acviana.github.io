@@ -4,7 +4,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Astronomy Automation with Python</title>
+  <title>A Basic Automation Setup for Astronomy: Part 2</title>
   <meta name="author" content="Alex C. Viana">
 
 
@@ -55,12 +55,13 @@
 <div>
   <article class="hentry" role="article">
 <header>
-      <h1 class="entry-title">Astronomy Automation with Python</h1>
-      <p class="meta"><time datetime="2013-11-23T00:00:00" pubdate>2013-11-23</time></p>
+      <h1 class="entry-title">A Basic Automation Setup for Astronomy: Part 2</h1>
+      <p class="meta"><time datetime="2013-12-10T00:00:00" pubdate>2013-12-10</time></p>
 </header>
 
   <div class="entry-content"><p>You may have noticed that we've only been talking about Python so far but I started this post by saying that this setup can execute -ANY- software, and it can. We're just going to warp it in Python first.</p>
-<h3>Python: Wrapping and Logging Your Code</h3>
+<h3>Wrapping Your Code with Python</h3>
+<h3>Logging Your Code</h3>
 <p>Python has a great <a href="http://docs.python.org/2/library/logging.html">logging</a> module. <em>Please</em> don't write your own. I know you're thinking, <em>"Oh that's just writing to a file, I can code that up myself ..."</em>. Don't it's way better than what you would make.</p>
 <p>Here is an example output from one of my scripts:</p>
 <div class="highlight"><pre><span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">719</span> <span class="o">-</span> <span class="n">jpl2db</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">User</span><span class="o">:</span> <span class="n">jstrummer</span>
@@ -87,13 +88,8 @@
         <span class="nx">logging</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;Python Executable Path: &#39;</span> <span class="o">+</span> <span class="nx">sys</span><span class="p">.</span><span class="nx">executable</span><span class="p">)</span>
 
         <span class="err">#</span> <span class="nx">Log</span> <span class="nx">PyRAF</span> <span class="nx">data</span>
-        <span class="k">try</span><span class="o">:</span>
-            <span class="kr">import</span> <span class="nx">pyraf</span>
-            <span class="nx">from</span> <span class="nx">pyraf</span> <span class="kr">import</span> <span class="nx">iraf</span>
-            <span class="nx">logging</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;PyRAF Version: &#39;</span> <span class="o">+</span> <span class="nx">pyraf</span><span class="p">.</span><span class="nx">__version__</span><span class="p">)</span>
-            <span class="nx">logging</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;PyRAF Path: &#39;</span> <span class="o">+</span> <span class="nx">pyraf</span><span class="p">.</span><span class="nx">__path__</span><span class="cp">[</span><span class="mi">0</span><span class="cp">]</span><span class="p">)</span>
-        <span class="nx">except</span> <span class="nx">ImportError</span> <span class="nx">as</span> <span class="nx">err</span><span class="o">:</span>
-            <span class="nx">logging</span><span class="p">.</span><span class="nx">critical</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">)</span>
+        <span class="nx">logging</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;PyRAF Version: &#39;</span> <span class="o">+</span> <span class="nx">pyraf</span><span class="p">.</span><span class="nx">__version__</span><span class="p">)</span>
+        <span class="nx">logging</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;PyRAF Path: &#39;</span> <span class="o">+</span> <span class="nx">pyraf</span><span class="p">.</span><span class="nx">__path__</span><span class="cp">[</span><span class="mi">0</span><span class="cp">]</span><span class="p">)</span>
 
         <span class="err">#</span> <span class="nx">Call</span> <span class="nx">the</span> <span class="kd">function</span> <span class="nx">and</span> <span class="nx">log</span> <span class="nx">the</span> <span class="nx">execution</span> <span class="nx">time</span><span class="p">.</span>
         <span class="nx">t1_time</span> <span class="o">=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">time</span><span class="p">()</span>
@@ -101,15 +97,27 @@
         <span class="nx">t2_time</span> <span class="o">=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">time</span><span class="p">()</span>
         <span class="nx">hours_time</span><span class="p">,</span> <span class="nx">remainder_time</span> <span class="o">=</span> <span class="nx">divmod</span><span class="p">(</span><span class="nx">t2_time</span> <span class="o">-</span> <span class="nx">t1_time</span><span class="p">,</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
         <span class="nx">minutes_time</span><span class="p">,</span> <span class="nx">seconds_time</span> <span class="o">=</span> <span class="nx">divmod</span><span class="p">(</span><span class="nx">remainder_time</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
-        <span class="nx">logging</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;Elapsed Real Time: {0:.0f}:{1:.0f}:{2:f}&#39;</span><span class="p">.</span><span class="nx">format</span><span class="p">(</span><span class="nx">hours_time</span><span class="p">,</span> <span class="nx">minutes_time</span><span class="p">,</span> <span class="nx">seconds_time</span><span class="p">))</span>
+        <span class="nx">logging</span><span class="p">.</span><span class="nx">info</span><span class="p">(</span><span class="s1">&#39;Elapsed Real Time: {0:.0f}:{1:.0f}:{2:f}&#39;</span><span class="p">.</span><span class="o">\</span>
+            <span class="nx">format</span><span class="p">(</span><span class="nx">hours_time</span><span class="p">,</span> <span class="nx">minutes_time</span><span class="p">,</span> <span class="nx">seconds_time</span><span class="p">))</span>
     <span class="k">return</span> <span class="nx">wrapped</span>
+</pre></div>
+
+
+<p>You script would then looks like this:</p>
+<div class="highlight"><pre><span class="nd">@log_info</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;My main function.&quot;&quot;&quot;</span>
+    <span class="n">make_science</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </pre></div></div>
     <footer>
 <p class="meta">
   <span class="byline author vcard">
     Posted by <span class="fn">Alex C. Viana</span>
   </span>
-<time datetime="2013-11-23T00:00:00" pubdate>2013-11-23</time>  <span class="categories">
+<time datetime="2013-12-10T00:00:00" pubdate>2013-12-10</time>  <span class="categories">
     <a class="category" href="http://acviana.github.io/tag/code.html">code</a>
     <a class="category" href="http://acviana.github.io/tag/devops.html">devops</a>
     <a class="category" href="http://acviana.github.io/tag/python.html">python</a>
@@ -122,6 +130,9 @@
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
+          <a href="http://acviana.github.io/posts/2013/guilty-as-charged/">Guilty As Charged</a>
+      </li>
+      <li class="post">
           <a href="http://acviana.github.io/posts/2013/that-time-i-made-a-metaclass/">That Time I Made a Metaclass</a>
       </li>
       <li class="post">
@@ -132,9 +143,6 @@
       </li>
       <li class="post">
           <a href="http://acviana.github.io/posts/2013/the-data-are-inconclusive/">The Data are Inconclusive</a>
-      </li>
-      <li class="post">
-          <a href="http://acviana.github.io/posts/2013/the-first-thousand-psfs/">The First Thousand PSFs</a>
       </li>
     </ul>
   </section>
@@ -149,7 +157,7 @@
 
   <section>
   <h1>Tags</h1>
-    <a href="http://acviana.github.io/tag/uvis.html">uvis</a>,    <a href="http://acviana.github.io/tag/code.html">code</a>,    <a href="http://acviana.github.io/tag/mtpipeline.html">mtpipeline</a>,    <a href="http://acviana.github.io/tag/python.html">python</a>,    <a href="http://acviana.github.io/tag/wfc3.html">wfc3</a>,    <a href="http://acviana.github.io/tag/psf.html">psf</a>,    <a href="http://acviana.github.io/tag/devops.html">devops</a>,    <a href="http://acviana.github.io/tag/wfpc2.html">wfpc2</a>,    <a href="http://acviana.github.io/tag/acs.html">acs</a>,    <a href="http://acviana.github.io/tag/jwst.html">jwst</a>,    <a href="http://acviana.github.io/tag/milestones.html">milestones</a>,    <a href="http://acviana.github.io/tag/hst.html">hst</a>,    <a href="http://acviana.github.io/tag/plots.html">plots</a>,    <a href="http://acviana.github.io/tag/pelican.html">pelican</a>  </section>
+    <a href="http://acviana.github.io/tag/uvis.html">uvis</a>,    <a href="http://acviana.github.io/tag/code.html">code</a>,    <a href="http://acviana.github.io/tag/humor.html">humor</a>,    <a href="http://acviana.github.io/tag/mtpipeline.html">mtpipeline</a>,    <a href="http://acviana.github.io/tag/python.html">python</a>,    <a href="http://acviana.github.io/tag/wfc3.html">wfc3</a>,    <a href="http://acviana.github.io/tag/database.html">database</a>,    <a href="http://acviana.github.io/tag/psf.html">psf</a>,    <a href="http://acviana.github.io/tag/devops.html">devops</a>,    <a href="http://acviana.github.io/tag/wfpc2.html">wfpc2</a>,    <a href="http://acviana.github.io/tag/acs.html">acs</a>,    <a href="http://acviana.github.io/tag/jwst.html">jwst</a>,    <a href="http://acviana.github.io/tag/git.html">git</a>,    <a href="http://acviana.github.io/tag/hst.html">hst</a>,    <a href="http://acviana.github.io/tag/milestones.html">milestones</a>,    <a href="http://acviana.github.io/tag/plots.html">plots</a>,    <a href="http://acviana.github.io/tag/pelican.html">pelican</a>  </section>
 
 
     <section>
@@ -199,7 +207,7 @@
 	  var disqus_shortname = 'theothersideofthescreen';
           var disqus_identifier = '/posts/2013/a-basic-automation-setup-2/';
           var disqus_url = 'http://acviana.github.io/posts/2013/a-basic-automation-setup-2/';
-          var disqus_title = 'Astronomy Automation with Python';
+          var disqus_title = 'A Basic Automation Setup for Astronomy: Part 2';
 	  (function() {
 	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
 	    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
