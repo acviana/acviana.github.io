@@ -4,7 +4,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>The Other Side of the Screen - pelican</title>
+  <title>Fitting 2D Gaussians with agpy</title>
   <meta name="author" content="Alex C. Viana">
 
 
@@ -52,35 +52,76 @@
 </ul></nav>
   <div id="main">
     <div id="content">
-<div class="blog-index">
-  		<article>
+<div>
+  <article class="hentry" role="article">
 <header>
-      <h1 class="entry-title">
-        <a href="http://acviana.github.io/posts/2013/the-trouble-with-tech-blogs/">The Trouble with Tech Blogs</a>
-      </h1>
-      <p class="meta"><time datetime="2013-11-17T00:00:00" pubdate>2013-11-17</time></p>
+      <h1 class="entry-title">Fitting 2D Gaussians with agpy</h1>
+      <p class="meta"><time datetime="2014-01-30T00:00:00" pubdate>2014-01-30</time></p>
 </header>
 
-  <div class="entry-content"><blockquote>
-<p>the trouble with poetry is<br />
-that it encourages the writing of more poetry<br />
- - Billy Collins, <a href="http://www.edutopia.org/trouble-poetry">The Trouble with Poetry</a></p>
-</blockquote>
-<p>To paraphrase one of my favorite poets, the trouble with tech blogs is that they encourage the writing of more tech blogs. The Internet probably doesn't need another tech blog ...</p></div>
-  <footer>
-    <a rel="full-article" href="http://acviana.github.io/posts/2013/the-trouble-with-tech-blogs/">Read On &crarr;</a>
-  </footer>
-  		</article>
-<div class="pagination">
+  <div class="entry-content"><p>After some <a href="http://acviana.github.io/posts/2013/counting-to-10-million-stars/">initial work</a> with fitting WFC3 UVIS PSFs with 1D Gaussians through the x and y axis I decided to look at 2d Guassian fitting as well. I was disappointed to find there wasn't already a canned procedure to do this in something like SciPy. But after not too much digging I decided to use <a href="http://casa.colorado.edu/~ginsbura/">Adam Ginsburg's</a> personal agpy library, which worked out great. </p>
+<p>You can clone the repo <a href="https://github.com/keflavich/agpy">here</a>. There are a couple of dependencies but I only satisfied the AstroPy and Numpy requirements and that was enough to run the <code>gaussfit</code> function. </p>
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">agpy</span> <span class="kn">import</span> <span class="n">gaussfitter</span>
 
-  <br />
-</div></div>
+<span class="n">mpfit</span><span class="p">,</span> <span class="n">psf_fit</span> <span class="o">=</span> <span class="n">gaussfitter</span><span class="o">.</span><span class="n">gaussfit</span><span class="p">(</span><span class="n">psf_array</span><span class="p">,</span> <span class="n">returnmp</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
+                                      <span class="n">returnfitimage</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Using <code>gaussfit</code> without the <code>returnmp</code> or <code>returnfitimage</code> parameters just returns a list with the following model parameters (in order): </p>
+<ul>
+<li>height</li>
+<li>amplitude</li>
+<li>x</li>
+<li>y</li>
+<li>width_x</li>
+<li>width_y</li>
+<li>rotation angle. </li>
+</ul>
+<p>Adding <code>returnfitimage=True</code> will also return a NumPy array of the model with the same dimensions as the input data. Lastly, setting <code>returnmp=True</code> will return a <code>mpfit</code> instance, which is the class used to generate the fit. The class is defined in the <code>agpy.mpfit_custom</code> module. The <code>mpfit</code> instance contains two useful attributes, <code>mpfit.params</code> which is the same list of parameters that <code>guassfit</code> returns by default, and <code>mpfits.covar</code> which is a 7x7 <a href="http://en.wikipedia.org/wiki/Covariance_matrix">covariance matrix</a> for the 7 modal parameters. </p>
+<p>It took me a little bit of work to figure out all these outputs but they were exactly waht I needed so I followed up with Adam and submitted my <em>first</em> FOSS PR on GitHub with some documentation <a href="https://github.com/keflavich/agpy/pull/2">improvements</a>. It's a small contribution but still a personal milestone.</p>
+<p>Finally, I made a plot of the input data, the model, and the residual (difference) at two different scales. I'm definitely happy with this and am looking forward to digging into the covariance matrix a little more to really understand how well I'm fitting these PSFs.</p>
+<p><img style="width: 800px; max-width: 100%; height: auto;" alt="Oops, something broke." src="/images/2d-gaussians.png" /></p></div>
+    <footer>
+<p class="meta">
+  <span class="byline author vcard">
+    Posted by <span class="fn">Alex C. Viana</span>
+  </span>
+<time datetime="2014-01-30T00:00:00" pubdate>2014-01-30</time>  <span class="categories">
+    <a class="category" href="http://acviana.github.io/tag/python.html">python</a>
+    <a class="category" href="http://acviana.github.io/tag/code.html">code</a>
+    <a class="category" href="http://acviana.github.io/tag/psf.html">psf</a>
+    <a class="category" href="http://acviana.github.io/tag/uvis.html">uvis</a>
+    <a class="category" href="http://acviana.github.io/tag/wfc3.html">wfc3</a>
+    <a class="category" href="http://acviana.github.io/tag/milestones.html">milestones</a>
+    <a class="category" href="http://acviana.github.io/tag/plots.html">plots</a>
+    <a class="category" href="http://acviana.github.io/tag/hst.html">hst</a>
+  </span>
+</p>    </footer>
+  </article>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
+  </section>
+</div>
 <aside class="sidebar">
   <section>
     <h1>Recent Posts</h1>
     <ul id="recent_posts">
       <li class="post">
-          <a href="http://acviana.github.io/posts/2013/the-trouble-with-tech-blogs/">The Trouble with Tech Blogs</a>
+          <a href="http://acviana.github.io/posts/2014/fitting-2d-gaussians-with-agpy/">Fitting 2D Gaussians with agpy</a>
+      </li>
+      <li class="post">
+          <a href="http://acviana.github.io/posts/2014/faster-file-checking-with-sets/">Faster File Existence Testing with Sets</a>
+      </li>
+      <li class="post">
+          <a href="http://acviana.github.io/posts/2014/2014-summer-internship-opportunity/">2014 Summer Internship Opportunity</a>
+      </li>
+      <li class="post">
+          <a href="http://acviana.github.io/posts/2013/guilty-as-charged/">Guilty As Charged</a>
+      </li>
+      <li class="post">
+          <a href="http://acviana.github.io/posts/2013/that-time-i-made-a-metaclass/">That Time I Made a Metaclass</a>
       </li>
     </ul>
   </section>
@@ -143,6 +184,9 @@ that it encourages the writing of more poetry<br />
 </script>
 	<script type="text/javascript">
 	  var disqus_shortname = 'theothersideofthescreen';
+          var disqus_identifier = '/posts/2014/fitting-2d-gaussians-with-agpy/';
+          var disqus_url = 'http://acviana.github.io/posts/2014/fitting-2d-gaussians-with-agpy/';
+          var disqus_title = 'Fitting 2D Gaussians with agpy';
 	  (function() {
 	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
 	    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
