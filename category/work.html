@@ -61,9 +61,22 @@
       <p class="meta"><time datetime="2014-01-30T00:00:00" pubdate>2014-01-30</time></p>
 </header>
 
-  <div class="entry-content"><p>After some <a href="http://acviana.github.io/posts/2013/counting-to-10-million-stars/">initial work</a> with fitting WFC3 UVIS PSFs with 1D Gaussians through the x and y axis I decided to look at 2d Guassian fitting as well. I was disappointed to find there wasn't already a canned procedure to do this in something like SciPy. But after not ...</p></div>
+  <div class="entry-content"><p><strong>Update 01/30/2014:</strong> Adam has split his <code>gaussfitter</code> code off into it's own GitHub repository <a href="https://github.com/keflavich/gaussfitter/blob/master/gaussfitter/gaussfitter.py">here</a> (<em>"PR's Welcome!"</em>). This removes some dependencies and changes the import statement but as of right now everything else is the same. I've maintained the old links to the original agpy ...</p></div>
   <footer>
     <a rel="full-article" href="http://acviana.github.io/posts/2014/fitting-2d-gaussians-with-agpy/">Read On &crarr;</a>
+  </footer>
+  		</article>
+  		<article>
+<header>
+      <h1 class="entry-title">
+        <a href="http://acviana.github.io/posts/2014/numpy-arrays-and-sql/">Working with NumPy Arrays and SQL</a>
+      </h1>
+      <p class="meta"><time datetime="2014-01-30T00:00:00" pubdate>2014-01-30</time></p>
+</header>
+
+  <div class="entry-content"><p>Lately I've been doing a lot (millions) of calculations involving small NumPy arrays of HST PSFs. Naturally, I wanted to save the output of these calculations to for later analysis. I put all the results in a MySQL database so I could easily select subsets of the data for ...</p></div>
+  <footer>
+    <a rel="full-article" href="http://acviana.github.io/posts/2014/numpy-arrays-and-sql/">Read On &crarr;</a>
   </footer>
   		</article>
   		<article>
@@ -186,21 +199,6 @@
     <a rel="full-article" href="http://acviana.github.io/posts/2013/the-first-thousand-psfs/">Read On &crarr;</a>
   </footer>
   		</article>
-  		<article>
-<header>
-      <h1 class="entry-title">
-        <a href="http://acviana.github.io/posts/2013/counting-to-10-million-stars/">Counting to 10 Million Stars</a>
-      </h1>
-      <p class="meta"><time datetime="2013-11-18T00:00:00" pubdate>2013-11-18</time></p>
-</header>
-
-  <div class="entry-content"><p>I've started a new project working with 10 million stellar PSFs. In my first few steps in the project I performed some model fitting and made a pretty visualization of the individual data points.</p>
-<h3>My New (Little) Big Data Project</h3>
-<p>I am starting a new project that I'm ...</p></div>
-  <footer>
-    <a rel="full-article" href="http://acviana.github.io/posts/2013/counting-to-10-million-stars/">Read On &crarr;</a>
-  </footer>
-  		</article>
 <div class="pagination">
     <a class="prev" href="http://acviana.github.io/category/work2.html">&larr; Older</a>
 
@@ -214,6 +212,9 @@
           <a href="http://acviana.github.io/posts/2014/fitting-2d-gaussians-with-agpy/">Fitting 2D Gaussians with agpy</a>
       </li>
       <li class="post">
+          <a href="http://acviana.github.io/posts/2014/numpy-arrays-and-sql/">Working with NumPy Arrays and SQL</a>
+      </li>
+      <li class="post">
           <a href="http://acviana.github.io/posts/2014/faster-file-checking-with-sets/">Faster File Existence Testing with Sets</a>
       </li>
       <li class="post">
@@ -221,9 +222,6 @@
       </li>
       <li class="post">
           <a href="http://acviana.github.io/posts/2013/guilty-as-charged/">Guilty As Charged</a>
-      </li>
-      <li class="post">
-          <a href="http://acviana.github.io/posts/2013/that-time-i-made-a-metaclass/">That Time I Made a Metaclass</a>
       </li>
     </ul>
   </section>

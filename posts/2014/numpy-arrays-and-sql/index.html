@@ -4,7 +4,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>The Trouble with Tech Blogs</title>
+  <title>Working with NumPy Arrays and SQL</title>
   <meta name="author" content="Alex C. Viana">
 
 
@@ -55,25 +55,61 @@
 <div>
   <article class="hentry" role="article">
 <header>
-      <h1 class="entry-title">The Trouble with Tech Blogs</h1>
-      <p class="meta"><time datetime="2013-11-17T00:00:00" pubdate>2013-11-17</time></p>
+      <h1 class="entry-title">Working with NumPy Arrays and SQL</h1>
+      <p class="meta"><time datetime="2014-01-30T00:00:00" pubdate>2014-01-30</time></p>
 </header>
 
-  <div class="entry-content"><blockquote>
-<p>the trouble with poetry is<br />
-that it encourages the writing of more poetry<br />
- - Billy Collins, <a href="http://www.edutopia.org/trouble-poetry">The Trouble with Poetry</a></p>
-</blockquote>
-<p>To paraphrase one of my favorite poets, the trouble with tech blogs is that they encourage the writing of more tech blogs. The Internet probably doesn't need another tech blog but I think this will be a fun way for me to both share and keep track of what I'm working on. Hopefully, some people will at least find it entertaining if not helpful.</p>
-<p>I tried to start this blog over a year ago with Octopress. I'd never worked with ruby before but I immediately feel in love with the idea of static HTML generated from Markdown. It seemed so elegant yet customizable, definitely a hacker's blogging platform. Of course I almost immediately broke the deploy step to GitHub and got pulled away to other projects. Then I stumbled across Pelican earlier this year, which is the same idea as Octopress but in Python! After several false starts I now finally have a working blog again! </p>
-<p>And so another tech blog begins!</p></div>
+  <div class="entry-content"><p>Lately I've been doing a lot (millions) of calculations involving small NumPy arrays of HST PSFs. Naturally, I wanted to save the output of these calculations to for later analysis. I put all the results in a MySQL database so I could easily select subsets of the data for future work (by filter, image, date, etc.). However, sometimes the outputs of these calculations are arrays themselves. This left me searching for a good way to save these NumPy arrays to a SQL database. </p>
+<p>Before I dive into this it's worth noting that there are non-SQL storage options that are specifically designed for use cases like this such as <a href="http://www.pytables.org/moin">PyTables</a> or <a href="http://en.wikipedia.org/wiki/Hierarchical_Data_Format">HDF5</a>. But, my project was already pretty tightly integrated with SQLAlchemy and I wasn't concerned with having readable, hierarchical, or queryable array information, which are the strengths of these other storage systems as I understand them. The queries I'm going to write are going to be constructed on other fields and the data is only going to analyzed once it had been read back in as a Numpy array in Python. So, all I really needed was a way to go between NumPy and some SQL data type.  </p>
+<h3>Starting with Strings</h3>
+<p>So my first thought was to just flatten the array into a string and then write that to the database as a <code>VARCHAR</code> field. So something like this:</p>
+<div class="highlight"><pre><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]])</span>
+</pre></div>
+
+
+<p>Which gives us:</p>
+<div class="highlight"><pre><span class="p">[[</span><span class="mi">1</span> <span class="mi">2</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">3</span> <span class="mi">4</span><span class="p">]]</span>
+</pre></div>
+
+
+<p>And then transform it into something like this:</p>
+<div class="highlight"><pre><span class="s">&#39;1,2,3,4&#39;</span>
+</pre></div>
+
+
+<p>And then I would just code up some logic in Python that would know to convert it back into a 2x2 array. The problem is then you start getting really awkward obtuse Python like this:</p>
+<div class="highlight"><pre><span class="n">string_array</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">numpy_array</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">())[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+
+
+<p>And on top of that you have to convince yourself that you are always reading and writing your strings in the correct order in terms of left/right and up/down, which means writing more tests. This quickly started to not feel right to me, especially if the end result was a human-readable SQL field that was never going to be read by a human while in the database.</p>
+<h3>Moving to Bytecode</h3>
+<p>After some digging and things I switched to bytecode. This isn't human readable (which is fine) but it easily and consistently goes in and out of numpy arrays with built-in methods and sits nicely in a SQL <code>BLOB</code> field. Writing looks like this:</p>
+<div class="highlight"><pre><span class="n">byte_array</span> <span class="o">=</span> <span class="n">numpy_array</span><span class="o">.</span><span class="n">tostring</span><span class="p">()</span>
+</pre></div>
+
+
+<p>Which gives me:</p>
+<div class="highlight"><pre>\<span class="n">x01</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x02</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x03</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x04</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span>\<span class="n">x00</span><span class="s">&#39;</span>
+</pre></div>
+
+
+<p>And converting back to numpy is just as easy:</p>
+<div class="highlight"><pre><span class="n">numpy_array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">byte_array</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Ta-Da! This does what I wanted and in my opinion has that intangible "pythonic" feel to it. The default NumPy datatype is <code>numpy.float64</code> but you can specify others with the <code>dtype</code> parameter. While this solution met my needs that are probably many other ways to accomplish this, feel free to tell me about them in the comments.</p></div>
     <footer>
 <p class="meta">
   <span class="byline author vcard">
     Posted by <span class="fn">Alex C. Viana</span>
   </span>
-<time datetime="2013-11-17T00:00:00" pubdate>2013-11-17</time>  <span class="categories">
-    <a class="category" href="http://acviana.github.io/tag/pelican.html">pelican</a>
+<time datetime="2014-01-30T00:00:00" pubdate>2014-01-30</time>  <span class="categories">
+    <a class="category" href="http://acviana.github.io/tag/python.html">python</a>
+    <a class="category" href="http://acviana.github.io/tag/code.html">code</a>
+    <a class="category" href="http://acviana.github.io/tag/psf.html">psf</a>
   </span>
 </p>    </footer>
   </article>
@@ -162,9 +198,9 @@ that it encourages the writing of more poetry<br />
 </script>
 	<script type="text/javascript">
 	  var disqus_shortname = 'theothersideofthescreen';
-          var disqus_identifier = '/posts/2013/the-trouble-with-tech-blogs/';
-          var disqus_url = 'http://acviana.github.io/posts/2013/the-trouble-with-tech-blogs/';
-          var disqus_title = 'The Trouble with Tech Blogs';
+          var disqus_identifier = '/posts/2014/numpy-arrays-and-sql/';
+          var disqus_url = 'http://acviana.github.io/posts/2014/numpy-arrays-and-sql/';
+          var disqus_title = 'Working with NumPy Arrays and SQL';
 	  (function() {
 	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
 	    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';

@@ -59,7 +59,9 @@
       <p class="meta"><time datetime="2014-01-30T00:00:00" pubdate>2014-01-30</time></p>
 </header>
 
-  <div class="entry-content"><p>After some <a href="http://acviana.github.io/posts/2013/counting-to-10-million-stars/">initial work</a> with fitting WFC3 UVIS PSFs with 1D Gaussians through the x and y axis I decided to look at 2d Guassian fitting as well. I was disappointed to find there wasn't already a canned procedure to do this in something like SciPy. But after not too much digging I decided to use <a href="http://casa.colorado.edu/~ginsbura/">Adam Ginsburg's</a> personal agpy library. I briefly met Adam at the <a href="http://dotastronomy.com/">dotAstronomy</a> conference last year in Boston. He's a contributor to <a href="http://www.astropy.org/">AstroPY</a>, <a href="http://astroquery.readthedocs.org/en/latest/">AstroQuery</a>, and <a href="http://aplpy.github.io/">AplPy</a> so I had a hunch I could trust his code and it's worked out great. </p>
+  <div class="entry-content"><p><strong>Update 01/30/2014:</strong> Adam has split his <code>gaussfitter</code> code off into it's own GitHub repository <a href="https://github.com/keflavich/gaussfitter/blob/master/gaussfitter/gaussfitter.py">here</a> (<em>"PR's Welcome!"</em>). This removes some dependencies and changes the import statement but as of right now everything else is the same. I've maintained the old links to the original agpy repo in the post below but please use the above repo for the latest version.</p>
+<hr />
+<p>After some <a href="http://acviana.github.io/posts/2013/counting-to-10-million-stars/">initial work</a> with fitting WFC3 UVIS PSFs with 1D Gaussians through the x and y axis I decided to look at 2d Guassian fitting as well. I was disappointed to find there wasn't already a canned procedure to do this in something like SciPy. But after some digging I decided to use <a href="http://casa.colorado.edu/~ginsbura/">Adam Ginsburg's</a> personal agpy library. I briefly met Adam at the <a href="http://dotastronomy.com/">dotAstronomy</a> conference last year in Boston. He's a contributor to <a href="http://www.astropy.org/">AstroPY</a>, <a href="http://astroquery.readthedocs.org/en/latest/">AstroQuery</a>, and <a href="http://aplpy.github.io/">AplPy</a> so I had a hunch I could trust his code and it's worked out great. </p>
 <p>You can clone the repo <a href="https://github.com/keflavich/agpy">here</a>. There are a couple of dependencies but I only satisfied the AstroPy and Numpy requirements and that was enough to run the <code>gaussfit</code> function. </p>
 <div class="highlight"><pre><span class="kn">from</span> <span class="nn">agpy</span> <span class="kn">import</span> <span class="n">gaussfitter</span>
 
@@ -78,8 +80,8 @@
 <li>width_y</li>
 <li>rotation angle. </li>
 </ul>
-<p>Adding <code>returnfitimage=True</code> will also return a NumPy array of the model with the same dimensions as the input data. Lastly, setting <code>returnmp=True</code> will return a <code>mpfit</code> instance, which is the class used to generate the fit. The class is defined in the <code>agpy.mpfit_custom</code> module. The <code>mpfit</code> instance contains two useful attributes, <code>mpfit.params</code> which is the same list of parameters that <code>guassfit</code> returns by default, and <code>mpfits.covar</code> which is a 7x7 <a href="http://en.wikipedia.org/wiki/Covariance_matrix">covariance matrix</a> for the 7 modal parameters. </p>
-<p>It took me a little bit of work to figure out all these outputs but they were exactly waht I needed so I followed up with Adam and submitted my <em>first</em> FOSS PR on GitHub with some documentation <a href="https://github.com/keflavich/agpy/pull/2">improvements</a>. It's a small contribution but still a personal milestone.</p>
+<p>Adding <code>returnfitimage=True</code> will also return a NumPy array of the model with the same dimensions as the input data. Lastly, setting <code>returnmp=True</code> will return a <code>mpfit</code> instance, which is the class used to generate the fit. The class is defined in the <code>agpy.mpfit_custom</code> module. The <code>mpfit</code> instance contains two useful attributes, <code>mpfit.params</code> which is the same list of parameters that <code>guassfit</code> returns by default, and <code>mpfits.covar</code> which is a 7x7 <a href="http://en.wikipedia.org/wiki/Covariance_matrix">covariance matrix</a> for the 7 model parameters. </p>
+<p>It took me a little bit of work to figure out all these outputs but they were exactly what I needed so I followed up with Adam and submitted my <em>first</em> FOSS PR on GitHub with some documentation <a href="https://github.com/keflavich/agpy/pull/2">improvements</a>. It's a small contribution but still a personal milestone.</p>
 <p>Finally, I made a plot of the input data, the model, and the residual (difference) at two different scales. I'm definitely happy with this and am looking forward to digging into the covariance matrix a little more to really understand how well I'm fitting these PSFs.</p>
 <p><img style="width: 800px; max-width: 100%; height: auto;" alt="Oops, something broke." src="/images/2d-gaussians.png" /></p></div>
     <footer>
@@ -112,6 +114,9 @@
           <a href="http://acviana.github.io/posts/2014/fitting-2d-gaussians-with-agpy/">Fitting 2D Gaussians with agpy</a>
       </li>
       <li class="post">
+          <a href="http://acviana.github.io/posts/2014/numpy-arrays-and-sql/">Working with NumPy Arrays and SQL</a>
+      </li>
+      <li class="post">
           <a href="http://acviana.github.io/posts/2014/faster-file-checking-with-sets/">Faster File Existence Testing with Sets</a>
       </li>
       <li class="post">
@@ -119,9 +124,6 @@
       </li>
       <li class="post">
           <a href="http://acviana.github.io/posts/2013/guilty-as-charged/">Guilty As Charged</a>
-      </li>
-      <li class="post">
-          <a href="http://acviana.github.io/posts/2013/that-time-i-made-a-metaclass/">That Time I Made a Metaclass</a>
       </li>
     </ul>
   </section>
