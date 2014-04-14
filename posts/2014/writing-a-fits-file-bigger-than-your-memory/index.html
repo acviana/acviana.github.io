@@ -7,6 +7,8 @@
   <title>Writing a FITS File Bigger Than Your Memory</title>
   <meta name="author" content="Alex C. Viana">
 
+  <link href="http://acviana.github.io/atom.xml" type="application/atom+xml" rel="alternate"
+        title="The Other Side of the Screen Atom Feed" />
 
 
   <!-- http://t.co/dKP3o1e -->
@@ -33,7 +35,7 @@
     <h2>"On the other side of the screen it all seems so easy." - Tron (1982)</h2>
 </hgroup></header>
   <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="http://acviana.github.io/" rel="subscribe-rss">RSS</a></li>
+  <li><a href="http://acviana.github.io/atom.xml" rel="subscribe-rss">RSS</a></li>
 </ul>
 
 <!-- TODO: add search here
@@ -59,40 +61,29 @@
       <p class="meta"><time datetime="2014-04-08T00:00:00" pubdate>2014-04-08</time></p>
 </header>
 
-  <div class="entry-content"><p><center><em>I need to start by thanking <a href="XXX">Erik Bray</a> for taking the time to explain this to me and then proof reading this post.</em></center></p>
+  <div class="entry-content"><p><center><em>I've listed <a href="https://plus.google.com/+ErikBray/about">Erik Bray</a>(<a href="https://github.com/embray">GitHub</a>) as a co-author on this post. Erik is one of the PyFITS developers and this post was born out of an email chain where he explained most of what follows to me, several times.</em></center></p>
 <blockquote>
 <p>"I’ve always thought that one of the the great things about physics is that you can add more digits to any number and see what happens and nobody can stop you."<br />
 - Randall Munroe, <a href="https://what-if.xkcd.com/20/">What If?</a></p>
 </blockquote>
-<p>I've been working a lot lately on my HST WFC3 <a href="http://acviana.github.io/tag/psf.html">PSF project</a> and recently had to solve a challenging scaling problem that forced me to deal with the hardware limits of my machine. I needed to create a FITS file containing a 4,000,000 x 11 x 11 data cube <sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup>. This is more than even my 16GB machine can handle and it resulted in <a href="http://en.wikipedia.org/wiki/Paging">paging</a> to the virtual memory which killed performance. As I was trying to find a solution to this problem a play on Randall Munroe's quote from the beginning of this post kept popping up in my head:</p>
+<p>I've been working a lot lately on my HST WFC3 <a href="http://acviana.github.io/tag/psf.html">PSF project</a> and recently had to solve a challenging scaling problem that forced me to deal with the hardware limits of my machine. I needed to create a FITS file containing a 4,000,000 x 11 x 11 data cube <sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup>. This ends up being more than my 16 GB machine can handle and it resulted in <a href="http://en.wikipedia.org/wiki/Paging">paging</a> to the virtual memory which killed performance. As I was trying to find a solution to this problem a play on Randall Munroe's quote from the beginning of this post kept popping up in my head:</p>
 <p><em>"The annoying thing about writing software is that people can just add zeros and break everything and you can't stop them."</em> </p>
-<p>So as exciting as it was that my dataset had grown to the point that it couldn't all fit in memory at once, the question now was <em>"how do you create a FITS file from a NumPy array that's too big to fit in memory?"</em></p>
-<h3>Chunking the Data</h3>
-<p>I store my entire dataset in a MySQL database so my first step was to break up the stellar images in the database into "chunks" that fit easily into memory. To do this I first queried the database to find the total number of records I was going to retrieve, then divided that by the size of my chunks and rounded up. Because all my records have a monotonically increasing integer primary key I can use the value of my primary key (<code>id</code>) to essentially numerically index the records and select all the records between two id numbers like slices in a Python list. Something like this:</p>
-<div class="highlight"><pre><span class="k">SELECT</span> <span class="o">*</span> <span class="k">FROM</span> <span class="n">psf_table</span> <span class="k">WHERE</span> <span class="n">id</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">AND</span> <span class="n">id</span> <span class="o">&lt;</span> <span class="mi">300</span><span class="p">,</span><span class="mi">000</span><span class="p">;</span>
-</pre></div>
-
-
-<p>This takes advantage of the fact that the <code>id</code> values I'm querying are contiguous and all the chunks contain the same number of records. If the records were more scattered each chunk would return a different number of records (up to the maximum chunk size) depending on how many records fell between those two <code>id</code> values. But for my purposes that's fine, my concern is keeping the memory use under control. If I cared about performance at that level I would learn how to implement this at the SQLAlchemy or SQL level, but that's beyond my needs for this project.</p>
+<p>So even thought it was exciting that my dataset had grown to the point that it couldn't all fit in memory at once, I was now faced with the problem of how to create a FITS file from a NumPy array that's too big to fit in memory?</p>
 <h3>Reading the Docs</h3>
-<p>Now that I have my data in memory in manageable chunks I can start writing to my FITS file. To do this I use the AstroPy <code>io.fits</code> <a href="http://astropy.readthedocs.org/en/latest/io/fits/index.html">module</a>. For those of you familiar with PyFITS you'll find that the code in AstroPyhas been wholly migrated over from PyFITS so the functionality is currently identical. So much so that you can still use the PyFITS docs to understand AstroPy's <code>io.fits</code>, which is great because the PyFITS FAQ explicitly answers this question: <a href="http://pyfits.readthedocs.org/en/latest/appendix/faq.html#how-can-i-create-a-very-large-fits-file-from-scratch">How can I create a very large fits file from scratch?</a>. Go ahead and read that section. </p>
+<p>I work with FITS files using the Astropy <code>io.fits</code> <a href="http://astropy.readthedocs.org/en/latest/io/fits/index.html">module</a>. For those of you familiar with PyFITS you'll find that the code in Astropy has been wholly migrated over from PyFITS so the functionality is currently identical. So much so that you can still use the PyFITS docs to understand Astropy's <code>io.fits</code>. This is great because the PyFITS FAQ explicitly answers this question: <a href="http://pyfits.readthedocs.org/en/latest/appendix/faq.html#how-can-i-create-a-very-large-fits-file-from-scratch">How can I create a very large fits file from scratch?</a>. Go ahead and read that section. </p>
 <p>With that FAQ as a starting point I ended up with this code snippet:</p>
-<div class="highlight"><pre><span class="k">if</span> <span class="n">chunk</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-    <span class="n">header</span> <span class="o">=</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span>
-    <span class="n">header</span><span class="p">[</span><span class="s">&#39;NAXIS1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">11</span>
-    <span class="n">header</span><span class="p">[</span><span class="s">&#39;NAXIS2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">11</span>
-    <span class="n">header</span><span class="p">[</span><span class="s">&#39;NAXIS3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record_count</span>
-    <span class="n">header</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">fits_file_name</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fits_file_name</span><span class="p">,</span> <span class="s">&#39;rb+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
-        <span class="n">fobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span> <span class="o">+</span> <span class="p">(</span><span class="mi">11</span> <span class="o">*</span> <span class="mi">11</span> <span class="o">*</span> <span class="n">record_count</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">fobj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\0</span><span class="s">&#39;</span><span class="p">)</span>
-<span class="n">bottom_index</span> <span class="o">=</span> <span class="n">chunk</span> <span class="o">*</span> <span class="n">chunk_size</span>
-<span class="n">top_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">chunk</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">chunk_size</span>
-<span class="n">hdul</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fits_file_name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;update&#39;</span><span class="p">)</span>
-<span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">bottom_index</span><span class="p">:</span><span class="n">top_index</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">numpy_data_cube</span> 
-<span class="n">hdul</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> 
+<div class="highlight"><pre><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">hdu</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">PrimaryHDU</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+<span class="n">header</span> <span class="o">=</span> <span class="n">hdu</span><span class="o">.</span><span class="n">header</span>
+<span class="n">header</span><span class="p">[</span><span class="s">&#39;NAXIS1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">header</span><span class="p">[</span><span class="s">&#39;NAXIS2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">11</span>
+<span class="n">header</span><span class="p">[</span><span class="s">&#39;NAXIS3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4000000</span>
+<span class="n">header</span><span class="o">.</span><span class="n">tofile</span><span class="p">(</span><span class="n">fits_file_name</span><span class="p">,</span> <span class="n">clobber</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">header_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+<span class="n">data_length</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">11</span> <span class="o">*</span> <span class="mi">11</span> <span class="o">*</span> <span class="mi">4000000</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">/</span> <span class="mf">2880.0</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fits_file_name</span><span class="p">,</span> <span class="s">&#39;rb+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
+    <span class="n">fobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">header_length</span> <span class="o">+</span> <span class="n">data_length</span>  <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">fobj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\0</span><span class="s">&#39;</span><span class="p">)</span>
 </pre></div>
 
 
@@ -108,33 +99,40 @@
 </pre></div>
 
 
-<p>If you were able to follow the FAQ the first 8 lines should make sense. I create a dummy NumPy array just to get the dimensionality right. Note that I explicitly create a single precision data type by specifying <code>dtype=np.float32</code>. Then I create a <code>PrimaryHDU</code> instance with that NumPy array. Under the hood the <code>fits</code> module is using this to set up some basic elements of the FITS file format. I then immediately hack those by changing the <code>NAXIS</code> keywords required by the FITS standard to match those of our expected output and not those of our dummy NumPy array. Changing this keyword doesn't do anything to actually change the dimensions or size of the file, those were set by our initial NumPy array. But it does update our header to match the data we'll be putting in. To wrap this section up I write the basic template of the file using the <code>tofile</code> method with the clobber option so that it overwrites the file if it already exists. As we keep going you'll see why we didn't just create the HDU with an array the size of our expected output in the first place.</p>
-<h3>Getting Close to the Metal</h3>
-<div class="highlight"><pre><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fits_file_name</span><span class="p">,</span> <span class="s">&#39;rb+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
-    <span class="n">fobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span> <span class="o">+</span> <span class="p">(</span><span class="mi">11</span> <span class="o">*</span> <span class="mi">11</span> <span class="o">*</span> <span class="n">record_count</span> <span class="o">*</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<p>To being with I create a dummy NumPy array just to get the FITS dimensionality right. As we keep going you'll see why we didn't just create the HDU with an array the size of our expected output in the first place. Then I create a <code>PrimaryHDU</code> instance with that NumPy array. Under the hood the <code>fits</code> module is using this to set up some basic elements of the FITS file format. But this is all being done in-memory, I haven't written anything to the disk yet. Next I changes the <code>NAXIS</code> keywords required by the FITS standard to match those of our expected output and not those of our dummy NumPy array. Changing this keyword doesn't do anything to actually change the dimensions or size of the file, those were set by our initial NumPy array. But it does update our header to match the data we'll be putting in. To wrap this up I use the <code>tofile</code> method to write <em>only the FITS header</em> to the disk with not actual data following it. PyFITS generally won't let you write an invalid FITS file, in this case it would complain that the <code>NAXIS</code> values don't match the 1 x 1 x 1 array we used to create the file, but we <em>can</em> write just the header as we're doing here. The clobber option overwrites the file if it already exists. </p>
+<h3>Hacking the Data</h3>
+<div class="highlight"><pre><span class="n">header_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">tostring</span><span class="p">())</span>
+<span class="n">data_length</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">11</span> <span class="o">*</span> <span class="mi">11</span> <span class="o">*</span> <span class="mi">4000000</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">/</span> <span class="mf">2880.0</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fits_file_name</span><span class="p">,</span> <span class="s">&#39;rb+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fobj</span><span class="p">:</span>
+    <span class="n">fobj</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">header_length</span> <span class="o">+</span> <span class="n">data_length</span>  <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">fobj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\0</span><span class="s">&#39;</span><span class="p">)</span>
 </pre></div>
 
 
 <p>Now comes the interesting part. One specific advantage Python offers scientists without a programming background is that Python is a "high level" programming language. The term "high" is subjective but the point is that Python takes care of many of the "low-level" aspects of programming such as memory allocation, pointers, and garbage collection. However, as you get further into the language you'll find that you have to learn how these concepts are implemented to take solve more complicated problems. This was one of those times for me.</p>
-<p>I start by using the "new" standard Python convention of using <code>with</code> to open a file object. In this case I open it with the <code>rb+</code> setting which means I'm going to be read (<code>r</code>) and update (<code>+</code>) the file in binary mode (<code>b</code>). Binary mode means that rather than trying to encode strings in something like UTF-8 the file object will expect raw byte code. </p>
-<p>When you open a file object in binary update mode your current position is the beginning of the file. Meaning if you tell python to start reading or writing to the file it will start right a the beginning of the file. In my case I don't want that so I first use the <code>seek</code> function to tell Python how far ahead on the disk to skip in units of bytes. </p>
-<p>I can use the <code>tostring</code> method like I did in my last post about <a href="">writing NumPy arrays to MySQL</a> and find the length of the header in bytes. Then I figure out how many bytes my data is going be by multiplying the number of elements in my array times the number of bytes required to store each element. This is interesting and something I haven't really thought about before; I can tell Python exactly how big my file will be before I write anything to it. I'm using a single precision, or 32bit, floating point, which can be represented by 4 bytes. So my data will take <code>11 x 11 x 4,000,000 x 4 byes</code> or a little over 1.8 GB. </p>
-<p>Now you can start to see why we needed to go through all this trouble. If we used a double precision float this would have been 3.6 GB of data. That would have to be read in from the database and then passed into an array and then written to the disk which would have required 7+ GB of memory. Plus the SQL query returns other fields and some of the memory is being used by system and suddenly it's clear why we couldn't do this all in memory. </p>
-<p>Also notice that I never had to tell Python <em>what</em> was going to be in those bytes. An array of complex decimals takes up just as much space as an array of zeros if they're both stored as the same data type. <em>This</em> is the reason we couldn't just create our original HDU with a 4,000,000 x 11 x 11 NumPy array of zeros - that would take up just as much room as a NumPy array of the real data!</p>
-<p>But what about the <code>- 1</code> at the end? Well we go back just one spot from the end in this case to write the final character of a FITS file, the <code>\0</code> byte. In this case it acts as kind of like a place holder staking out how big the file is going to be. So what was the point of all that? Well, without even needing to create anything in memory anywhere near the size of our dataset we've now created a file exactly big enough to hold all our data. </p>
+<p>Let's jump to the middle where I use the "new" standard Python convention of using <code>with</code> to open a file object. In this case I open it with the <code>rb+</code> setting which means I'm going to be read (<code>r</code>) and update (<code>+</code>) the file in binary mode (<code>b</code>). Binary mode means that rather than trying to decode strings in something like UTF-8 the file object will read raw bytes. </p>
+<p>When you open a file object in binary update mode your current position is the beginning of the file. Meaning if you tell python to start reading or writing to the file it will start right a the beginning of the file. In my case I don't want that so I first use the <code>seek</code> function to tell Python how far ahead on the disk to skip in units of bytes. In this case I want to seek ahead by the length of my final FITS file in units of bytes. It's worth noting that I'm taking advantage of the fact that <code>seek</code> will, by design, seek past the end of the file. It's worth noting that this is all being done at a very high level, I'm not actually seeking on the disk or even memory locations. </p>
+<p>For clarity I've broken up this calculation into two variables, <code>header_length</code> and <code>data_lenght</code>. I use the <code>tostring</code> <a href="http://stsdas.stsci.edu/stsci_python_sphinxdocs_2.13/pyfits/api_docs/api_headers.html?highlight=tostring#pyfits.Header.tostring">method</a> to return a string representation of the header. Because each character can be represented by one byte the string length is the same as the byte length.</p>
+<p>Next I figure out how many bytes my data is going to be. I do this by multiplying the number of elements in my array times the number of bytes required to store each element. This is interesting and something I haven't really thought about before; I can tell Python exactly how big my file will be before I write anything to it. I'm using a double precision, or 64bit, floating point, which can be represented by 8 bytes. So my data will take <code>11 x 11 x 4,000,000 x 8 byes</code> or a little over 3.6 GB. </p>
+<p>Now you can start to see why we needed to go through all this trouble. This data would have first have to have been read into memory from a different format (SQL in this case) and then copied into a NumPy array, that's 7+ GB of memory right there. Additionally, there's a couple of GB of metadata I need to load in as well, plus what's being used by system. And my data set is growing constantly. Suddenly, it's clear why we couldn't do this all in memory. </p>
+<p>Actually, you'll notice it's a little more complicated then that. I'm actually rounding up to the next multiple of 2880 bytes. This is because, and I'm trying to say this with a straight face, of historical limitations on how <em>tape</em> machines used to read FITS data. So just like the FORTRAN line limit, this is a historical artifact we just have to live with. If you read the documentation carefully for the <code>header.tostring</code> method you'll see this was automatically done for the header when it was turned into a string.</p>
+<p>Also notice that I never had to tell Python <em>what</em> was going to be in those bytes. An array of complex decimals takes up just as much space as an array of zeros if they're both stored as the same data type. <em>This</em> is the reason I couldn't just create our original HDU with a 4,000,000 x 11 x 11 NumPy array of zeros - that would take up just as much room as a NumPy array of the real data! </p>
+<p>But what about the <code>- 1</code> at the end? Well I go back just one byte from the end to write the final character of the FITS file, the <code>\0</code> byte. In this case it acts as kind of like a place holder staking out how big the file is going to be. So what was the point of all that? Well, without even needing to create anything in memory anywhere near the size of our dataset we've now created a file exactly big enough to hold all our data. </p>
+<p>Note that what we've created is called a <a href="http://en.wikipedia.org/wiki/Sparse_file">sparse file</a> and how it's implemented will depend on your file system. Certain file systems will just add some metadata letting the system know that it's just blank space, whereas other file systems such as Apple's HFS+ will go through and write each "blank" byte which will take just as long as writing real data.</p>
 <h3>(Finally) Writing the Data</h3>
-<div class="highlight"><pre><span class="n">bottom_index</span> <span class="o">=</span> <span class="n">chunk</span> <span class="o">*</span> <span class="n">chunk_size</span>
-<span class="n">top_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">chunk</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">chunk_size</span>
-<span class="n">hdul</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fits_file_name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;update&#39;</span><span class="p">)</span>
-<span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">bottom_index</span><span class="p">:</span><span class="n">top_index</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">numpy_data_cube</span> 
+<div class="highlight"><pre><span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fits_file_name</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;update&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdlu</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">bottom_index</span><span class="p">,</span> <span class="n">top_index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bottom_index_list</span><span class="p">,</span> <span class="n">top_index_list</span><span class="p">):</span>
+        <span class="n">numpy_data_cube</span> <span class="o">=</span> <span class="n">get_data_chunk</span><span class="p">(</span><span class="n">bottom_index</span><span class="p">,</span> <span class="n">top_index</span><span class="p">)</span>
+        <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">bottom_index</span><span class="p">:</span><span class="n">top_index</span><span class="p">,:,:]</span> <span class="o">=</span> <span class="n">numpy_data_cube</span> 
 <span class="n">hdul</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> 
 </pre></div>
 
 
-<p>Now that we've created our output file of the correct size and dimensionality we can start writing our data chunks to the file. As you can see the 3rd line here uses <code>fits.open</code> to open our FITS file. But wait, what's going on here? Won't opening this file just read all the data into memory - the exact thing we're trying to avoid?</p>
-<p>What's happening is that the <code>fits</code> module is by default opening the file with <a href="http://en.wikipedia.org/wiki/Mmap">mmap</a>. What this means is that the file is read in a "lazy" or "on-demand" mode, data is only read into memory as needed. You can find more info in both the <a href="http://astropy.readthedocs.org/en/latest/io/fits/index.html#working-with-large-files">AstroPy</a> and <a href="http://pyfits.readthedocs.org/en/latest/appendix/faq.html#how-do-i-open-a-very-large-image-that-won-t-fit-in-memory">PyFITS</a> docs.</p>
-<p>Look back at my code snippet you can see that I index the FITS data just like a NumPy array and then update it with the chunk from my current data cube. Iterating over this eventually write the entire file without ever needing to store the entire FITS data in memory at once.</p>
+<p>Now that I've created the output file of the correct size and dimensionality I can start writing data to the file. Fist I use <code>fits.open</code> with the <code>with</code> convention to open the FITS file. But wait, what's going on here? Won't opening this file just read all the data into memory - the exact thing we're trying to avoid?</p>
+<p>What's happening is that the <code>fits</code> module is by default opening the file with <a href="http://en.wikipedia.org/wiki/Mmap">mmap</a>. What this means is that the file is read in a "lazy" or "on-demand" mode, data is only read into memory as needed. You can find more info in both the <a href="http://astropy.readthedocs.org/en/latest/io/fits/index.html#working-with-large-files">Astropy</a> and <a href="http://pyfits.readthedocs.org/en/latest/appendix/faq.html#how-do-i-open-a-very-large-image-that-won-t-fit-in-memory">PyFITS</a> docs.</p>
+<p>Next I step through the data I want to add to the FITS file in chunks that easily fit in memory. I wrote some generic code that does this by stepping over some indices and passing them to a function <code>get_data_chunk</code> that returns the next "chunk" of records as a NumPy array. I index the FITS data just like a NumPy array (because it is one) and then update it with the chunk from my current data cube. Iterating over this eventually write the entire file without ever needing to store the entire FITS data in memory at once.</p>
+<h3>One More Thing</h3>
+<p>Erik pointed out that there is a little-known feature in PyFITS called the <a href="https://github.com/spacetelescope/PyFITS/blob/master/lib/pyfits/hdu/streaming.py">StreamingHDU</a> class. It's an alternative way to make a FITS file on disk just by outputting the header and then writing the data one chunk at a time: http://pyfits.readthedocs.org/en/latest/api_docs/api_hdus.html#streaminghdu</p>
 <div class="footnote">
 <hr />
 <ol>
@@ -146,7 +144,7 @@
     <footer>
 <p class="meta">
   <span class="byline author vcard">
-    Posted by <span class="fn">Alex C. Viana</span>
+    Posted by <span class="fn">Alex C. Viana, Erik Bray</span>
   </span>
 <time datetime="2014-04-08T00:00:00" pubdate>2014-04-08</time>  <span class="categories">
     <a class="category" href="http://acviana.github.io/tag/fits.html">fits</a>
@@ -155,10 +153,6 @@
   </span>
 </p>    </footer>
   </article>
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript></div>
-  </section>
 </div>
 <aside class="sidebar">
   <section>
@@ -220,34 +214,5 @@
   Copyright &copy; 2013 - Alex C. Viana -
   <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
 </p></footer>
-    <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-45960611-1']);
-    _gaq.push(['_trackPageview']);
-    (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-45960611-1');
-    ga('send', 'pageview');
-</script>
-	<script type="text/javascript">
-	  var disqus_shortname = 'theothersideofthescreen';
-          var disqus_identifier = '/posts/2014/writing-a-fits-file-bigger-than-your-memory/';
-          var disqus_url = 'http://acviana.github.io/posts/2014/writing-a-fits-file-bigger-than-your-memory/';
-          var disqus_title = 'Writing a FITS File Bigger Than Your Memory';
-	  (function() {
-	    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-	    dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-	    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-	   })();
-	</script>
 </body>
 </html>
