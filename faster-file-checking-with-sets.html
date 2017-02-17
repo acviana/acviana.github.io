@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="/theme/css/style.css">
+	<!--<link rel="stylesheet/less" type="text/css" href="/theme/css/style.less">-->
+	<!--<script src="/theme/js/less.js" type="text/javascript"></script>-->
+	<link rel="stylesheet" type="text/css" href="/theme/css/pygments.css">
+	<link href='//fonts.googleapis.com/css?family=Open+Sans:800,400,300|Inconsolata' rel='stylesheet' type='text/css'>
+
+
+
+		<title>The Other Side of the Screen</title>
+		<meta charset="utf-8" />
+</head>
+<body>
+	<section id="sidebar">
+		<figure id="user_logo">
+            <a href=""><div class="logo">&nbsp;</div></a>
+		</figure>
+
+		<div class="user_meta">
+            <h1 id="user"><a href="" class="">Alex C. Viana</a></h1>
+			<h2></h2>
+			<ul>
+						<li><a href="/pages/about.html">About</a></li>
+					<li><a href="http://getpelican.com/">Pelican</a></li>
+					<li><a href="http://python.org/">Python.org</a></li>
+					<li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+					<li><a href="#">You can modify those links in your config file</a></li>
+			</ul>
+		</div>
+		<footer>
+			<address>
+				Powered by <a href="http://pelican.notmyidea.org/">Pelican</a>,
+		                theme by <a href="https://github.com/wting/pelican-svbtle">wting</a>.
+			</address>
+		</footer>
+	</section>
+
+	<section id="posts">
+	<header>
+		<h1>Alex C. Viana's blog</h1>
+		<h3>Posted Sun 19 January 2014</h3>
+	</header>
+	<article>
+		<h1 id="title">
+			<a href="/faster-file-checking-with-sets.html" rel="bookmark"
+				title="Permalink to Faster File Existence Testing with Sets">Faster File Existence Testing with Sets</a>
+		</h1>
+		<h3>It's Time to Think about Performance</h3>
+<p>Lately at work I've been thinking a lot about the performance of my code.  In the past most of my work fell into one of two performance categories: (roughly) overnight or (roughly) right now. In either case I didn't really care about performance. Either the task was going to take so long I had time to go do something else, in which case I didn't care if it took 1 hour or 10. Or it was going to be done fast enough I could immediately start iterating on the results, again in which case I didn't really care if was going to take 1 second or 10. I think this is indicative of the scientific computing mindset where you are both the programmer and the user: fast means fast enough for <em>you</em>. </p>
+<p>But recently my datasets have been getting bigger (which is awesome) which has forced me to be more careful about my programming. I'm routinely finding my scripts out-growing both of my performance "categories" and either taking several minutes to run or several days. Both scenarios leave <em>me</em> waiting around, which is the real problem. While I always try, to the best of my abilities, to write high-quality code my time is more scarce and expensive than CPU time. This means that I optimize my time, not the CPU's. However, when I <em>do</em> find myself waiting around for some code to run, it's time to roll up my sleeves and find some speedups.</p>
+<p>The work I do is very I/O intensive involving lots of databases and data files. I/O is extremely <a href="https://gist.github.com/hellerbarde/2843375">expensive</a> in terms of latency so reducing trips to the disk can yield sizable speedups. Here's an example I found today that includes an introduction to a handy (and I would argue underutilized) Python type called sets.</p>
+<h3>The Slow Way</h3>
+<p>I was working on a project where I wanted to verify that all the files I had listed in a database actually existed in my file system <sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup>. To do this I wrote a SQL query in SQLAlchemy to grab all the file names listed in the database. Then I looped over the the records returned by the query and used <code>os.path.exists</code> to test the existence of each file in the file system.</p>
+<div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">database_query</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">fits_file</span><span class="p">)</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s1">&#39;Missing {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">fits_file</span><span class="p">)</span>
+</pre></div>
+
+
+<p>There were 3,096 iterations (records) in this loop and the IPython <code>%%timeit</code> cell magic gave the following result:</p>
+<div class="highlight"><pre><span></span>1 loops, best of 3: 103 s per loop
+</pre></div>
+
+
+<p>This is a bit too long of a wait for me. It's long enough for me to get distracted by Facebook or maybe writing a blog post. I kid but task switching <em>does</em> have a real <a href="http://www.codinghorror.com/blog/2006/09/the-multi-tasking-myth.html">mental overhead</a>. I'm not advocating optimizing every task that makes you sit around for a few minutes, but in this case the solution was trivial and applicable to lots of my projects.</p>
+<h3>The Fast Way</h3>
+<p>It occurred to me that I was making 3,096 separate trips to the disk. It's my understanding that there is some overhead for each disk read so I thought maybe it would be faster to read everything I needed at once and then work with the result in memory. To do this I used <code>glob</code> and create a list of all the files in my file system I wanted to check my query against. This gave me all the data I wanted in memory from one SQL query and one <code>glob</code> command. That reduced the problem to a membership testing problem and Python has a great built-in type for this, <a href="http://docs.python.org/2/tutorial/datastructures.html#sets">sets</a>. Sets are unordered <a href="https://en.wikipedia.org/wiki/Hash_table">hash tables</a> which means their average performance for a lookup operation is the holy grail of speed, <code>O(1)</code>. Incorporating all this into my code looks like this:</p>
+<div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">file_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">file_search_string</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">database_query</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">fits_file</span> <span class="ow">in</span> <span class="n">file_set</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s1">&#39;Missing {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">fits_file</span><span class="p">)</span>
+</pre></div>
+
+
+<p>It turns out I was right, this is almost a full order of magnitude faster than my original code.</p>
+<div class="highlight"><pre><span></span>1 loops, best of 3: 10.6 s per loop
+</pre></div>
+
+
+<h3>Caveats</h3>
+<p>So I think the principles behind this speed up are solid but, as always, your mileage my vary and there are some caveats I can think of.</p>
+<p>First of all, the file system I am searching is a network file system that I'm connecting to over VPN, this makes each disk read exceptionally expensive. Secondly, the <code>glob</code> operation is very expensive, almost all the run time is spent in that step. So if you're only checking a few files it might be faster to just look them up one-by-one than to use wildcards to scan a file tree. I'm not sure where the tipping point is, but it's certainly worthwhile if you're checking every file like I am.</p>
+<p>I've just starting thinking about these topics so if I missed something in my code or my explanation I would love to hear about it the comments.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>If you're wondering why I want to do this, yes, it's because I screwed up and put the wrong files in the database.&#160;<a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+		<div id="article_meta">
+				Category:
+					<a href="/category/work.html">Work</a>
+				<br />Tags:
+					<a href="/tag/python.html">python</a>
+					<a href="/tag/code.html">code</a>
+		</div>
+	</article>
+
+	<footer>
+		<a href="/" class="button_accent">&larr;&nbsp;&nbsp;&nbsp;Back to blog</a>
+	</footer>
+
+
+	</section>
+
+</body>
+</html>

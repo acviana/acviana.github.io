@@ -1,209 +1,140 @@
 <!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>A Basic Automation Setup for Astronomy: Part 2</title>
-  <meta name="author" content="Alex C. Viana">
+	<link rel="stylesheet" type="text/css" href="/theme/css/style.css">
+	<!--<link rel="stylesheet/less" type="text/css" href="/theme/css/style.less">-->
+	<!--<script src="/theme/js/less.js" type="text/javascript"></script>-->
+	<link rel="stylesheet" type="text/css" href="/theme/css/pygments.css">
+	<link href='//fonts.googleapis.com/css?family=Open+Sans:800,400,300|Inconsolata' rel='stylesheet' type='text/css'>
 
-  <link href="http://acviana.github.io/atom.xml" type="application/atom+xml" rel="alternate"
-        title="The Other Side of the Screen Atom Feed" />
 
 
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <link href="http://acviana.github.io/favicon.png" rel="icon">
-  <link href="http://acviana.github.io/theme/css/main.css" media="screen, projection"
-        rel="stylesheet" type="text/css">
-  <script src="http://acviana.github.io/theme/js/modernizr-2.0.js"></script>
-  <script src="http://acviana.github.io/theme/js/ender.js"></script>
-  <script src="http://acviana.github.io/theme/js/octopress.js" type="text/javascript"></script>
-
-  <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic"
-        rel="stylesheet" type="text/css">
-  <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic"
-        rel="stylesheet" type="text/css">
+		<title>The Other Side of the Screen</title>
+		<meta charset="utf-8" />
 </head>
-
 <body>
-  <header role="banner"><hgroup>
-  <h1><a href="http://acviana.github.io/">The Other Side of the Screen</a></h1>
-    <h2>"On the other side of the screen it all seems so easy." - Tron (1982)</h2>
-</hgroup></header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="http://acviana.github.io/atom.xml" rel="subscribe-rss">RSS</a></li>
-</ul>
+	<section id="sidebar">
+		<figure id="user_logo">
+            <a href=""><div class="logo">&nbsp;</div></a>
+		</figure>
 
-<!-- TODO: add search here
-<form action="" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:http://acviana.github.io" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
--->
+		<div class="user_meta">
+            <h1 id="user"><a href="" class="">Alex C. Viana</a></h1>
+			<h2></h2>
+			<ul>
+						<li><a href="/pages/about.html">About</a></li>
+					<li><a href="http://getpelican.com/">Pelican</a></li>
+					<li><a href="http://python.org/">Python.org</a></li>
+					<li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+					<li><a href="#">You can modify those links in your config file</a></li>
+			</ul>
+		</div>
+		<footer>
+			<address>
+				Powered by <a href="http://pelican.notmyidea.org/">Pelican</a>,
+		                theme by <a href="https://github.com/wting/pelican-svbtle">wting</a>.
+			</address>
+		</footer>
+	</section>
 
-<ul class="main-navigation">
-      <li><a href="http://acviana.github.io/pages/about.html">About</a></li>
-      <li><a href="http://acviana.github.io/pages/disclaimer.html">Disclaimer</a></li>
-    <!-- TODO: add categories here? -->
-</ul></nav>
-  <div id="main">
-    <div id="content">
-<div>
-  <article class="hentry" role="article">
-<header>
-      <h1 class="entry-title">A Basic Automation Setup for Astronomy: Part 2</h1>
-      <p class="meta"><time datetime="2013-12-10T00:00:00" pubdate>2013-12-10</time></p>
-</header>
-
-  <div class="entry-content"><h3>Why Log Files?</h3>
+	<section id="posts">
+	<header>
+		<h1>Alex C. Viana's blog</h1>
+		<h3>Posted Tue 10 December 2013</h3>
+	</header>
+	<article>
+		<h1 id="title">
+			<a href="/drafts/a-basic-automation-setup-2.html" rel="bookmark"
+				title="Permalink to A Basic Automation Setup for Astronomy: Part 2">A Basic Automation Setup for Astronomy: Part 2</a>
+		</h1>
+		<h3>Why Log Files?</h3>
 <p>Let's put on our imagining caps. Pretend that you have already set up an automated pipeline like the one I described in the first post in this series (In fact some people already have). One day your boss walks into your office and asks for some details on about something you pipeline made 6 months ago. Maybe they want to know what input files were used. Or what settings and options were used. Or Maybe they want to reproduce a figure. How would you do that? </p>
 <p>Something that I think sometimes gets lost when you start to transfer you work to a more automated work flow is our old friend the lab notebook. For any data products your automation platform produces you should be able to tell someone exactly what inputs were used, what software, and even what version of your software. Ideally, someone should even be able to figure this out for themselves. Log files are a great way to accomplish this type of detailed record keeping, essentially generating an automated lab notebook. Here is an example output from one of my scripts:</p>
-<div class="highlight"><pre><span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">719</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">User</span><span class="o">:</span> <span class="n">jstrummer</span>
-<span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">720</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">Host</span><span class="o">:</span> <span class="n">casbah</span>
-<span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">745</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">Machine</span><span class="o">:</span> <span class="n">x86_64</span>
-<span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">747</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">Platform</span><span class="o">:</span> <span class="n">Linux</span><span class="o">-</span><span class="mf">2.6.32</span><span class="o">-</span><span class="mf">358.18.1</span><span class="p">.</span><span class="n">el6</span><span class="p">.</span><span class="n">x86_64</span><span class="o">-</span><span class="n">x86_64</span><span class="o">-</span><span class="n">with</span><span class="o">-</span><span class="n">redhat</span><span class="o">-</span><span class="mf">6.4</span><span class="o">-</span><span class="n">Santiago</span>
-<span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">747</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">Command</span><span class="o">-</span><span class="n">line</span> <span class="n">arguments</span> <span class="n">used</span><span class="o">:</span>
-<span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">747</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">reproc</span><span class="o">:</span> <span class="n">False</span>
-<span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">747</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">filelist</span><span class="o">:</span> <span class="o">/*</span><span class="n">_saturn</span><span class="o">/*</span><span class="n">single_sci</span><span class="p">.</span><span class="n">fits</span>
-<span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">820</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">Processing</span> <span class="mi">2722</span> <span class="n">files</span><span class="p">.</span>
-<span class="mi">2013</span><span class="o">-</span><span class="mi">11</span><span class="o">-</span><span class="mi">22</span> <span class="mi">10</span><span class="o">:</span><span class="mi">08</span><span class="o">:</span><span class="mi">52</span><span class="p">,</span><span class="mi">821</span> <span class="o">-</span> <span class="n">INFO</span> <span class="o">-</span> <span class="n">Now</span> <span class="n">running</span> <span class="n">on</span> <span class="n">u2ona109t_c0m_center_single_sci</span><span class="p">.</span><span class="n">fits</span>
-<span class="p">...</span>
+<div class="highlight"><pre><span></span>2013-11-22 10:08:52,719 - INFO - User: jstrummer
+2013-11-22 10:08:52,720 - INFO - Host: casbah
+2013-11-22 10:08:52,745 - INFO - Machine: x86_64
+2013-11-22 10:08:52,747 - INFO - Platform: Linux-2.6.32-358.18.1.el6.x86_64-x86_64-with-redhat-6.4-Santiago
+2013-11-22 10:08:52,747 - INFO - Command-line arguments used:
+2013-11-22 10:08:52,747 - INFO - reproc: False
+2013-11-22 10:08:52,747 - INFO - filelist: /*_saturn/*single_sci.fits
+2013-11-22 10:08:52,820 - INFO - Processing 2722 files.
+2013-11-22 10:08:52,821 - INFO - Now running on u2ona109t_c0m_center_single_sci.fits
+...
 </pre></div>
 
 
 <p>With the command line <code>grep</code> utility you can quickly start to look for trends. If you want to do even more you can explore the Pandas Python package, more on that in a later post. </p>
 <h3>Getting Started with the Python Logger</h3>
 <p>Python has a great <a href="http://docs.python.org/2/library/logging.html">logging</a> module. You can find a basic tutorial <a href="http://docs.python.org/2/howto/logging.html#logging-basic-tutorial">here</a>. There are lots of ways to invoke and setup the Python logger. I usually define a function something like this and import it throughout my project.</p>
-<div class="highlight"><pre><span class="kn">import</span> <span class="nn">logging</span>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 
 <span class="k">def</span> <span class="nf">setup_logging</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Set up the logging.&quot;&quot;&quot;</span>
-    <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s">&#39;/my-project/logs/&#39;</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span>
-        <span class="n">module</span> <span class="o">+</span> <span class="s">&#39;_&#39;</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s">-%H-%M&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;.log&#39;</span><span class="p">)</span>
+    <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/my-project/logs/&#39;</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span>
+        <span class="n">module</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">-%H-%M&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span><span class="p">)</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">filename</span> <span class="o">=</span> <span class="n">log_file</span><span class="p">,</span>
-        <span class="n">format</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%(asctime)s</span><span class="s"> </span><span class="si">%(levelname)s</span><span class="s">: </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">,</span>
-        <span class="n">datefmt</span> <span class="o">=</span> <span class="s">&#39;%m/</span><span class="si">%d</span><span class="s">/%Y %H:%M:%S %p&#39;</span><span class="p">,</span>
+        <span class="n">format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">datefmt</span> <span class="o">=</span> <span class="s1">&#39;%m/</span><span class="si">%d</span><span class="s1">/%Y %H:%M:%S %p&#39;</span><span class="p">,</span>
         <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 </pre></div>
 
 
 <p>What this does is it will create a separate log directory for each module and the log the outputs in a date-stamped file, e.g. <code>/my-project/logs/my_module/my_module_2013-12-22-15-41.log</code>. Every line in the log file will then begin with a date and time stamp, followed by the level name and then the logging message, similar to the output I showed in the last section. Lastly, I tell it to log all statements down to the "INFO" level.</p>
 <h3>A Logging Recipe</h3>
-<div class="highlight"><pre><span class="k">def</span> <span class="nf">log_info</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log_info</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Decorator to log some useful environment information.&quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
 
-        <span class="c"># Log user, system, and Python metadata</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;User: &#39;</span> <span class="o">+</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">())</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;System: &#39;</span> <span class="o">+</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Python Version: &#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">))</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Python Executable Path: &#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">)</span>
+        <span class="c1"># Log user, system, and Python metadata</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;User: &#39;</span> <span class="o">+</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">())</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;System: &#39;</span> <span class="o">+</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Python Version: &#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Python Executable Path: &#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">)</span>
 
-        <span class="c"># Log PyRAF data</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;PyRAF Version: &#39;</span> <span class="o">+</span> <span class="n">pyraf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;PyRAF Path: &#39;</span> <span class="o">+</span> <span class="n">pyraf</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># Log PyRAF data</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;PyRAF Version: &#39;</span> <span class="o">+</span> <span class="n">pyraf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;PyRAF Path: &#39;</span> <span class="o">+</span> <span class="n">pyraf</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-        <span class="c"># Call the function and log the execution time.</span>
+        <span class="c1"># Call the function and log the execution time.</span>
         <span class="n">t1_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
         <span class="n">t2_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">hours_time</span><span class="p">,</span> <span class="n">remainder_time</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">t2_time</span> <span class="o">-</span> <span class="n">t1_time</span><span class="p">,</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
         <span class="n">minutes_time</span><span class="p">,</span> <span class="n">seconds_time</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">remainder_time</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Elapsed Real Time: {0:.0f}:{1:.0f}:{2:f}&#39;</span><span class="o">.</span>\
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Elapsed Real Time: {0:.0f}:{1:.0f}:{2:f}&#39;</span><span class="o">.</span>\
             <span class="n">format</span><span class="p">(</span><span class="n">hours_time</span><span class="p">,</span> <span class="n">minutes_time</span><span class="p">,</span> <span class="n">seconds_time</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">wrapped</span>
 </pre></div>
 
 
 <p>You script would then looks like this:</p>
-<div class="highlight"><pre><span class="nd">@log_info</span>
+<div class="highlight"><pre><span></span><span class="nd">@log_info</span>
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;My main function.&quot;&quot;&quot;</span>
     <span class="n">make_science</span><span class="p">()</span>
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
-</pre></div></div>
-    <footer>
-<p class="meta">
-  <span class="byline author vcard">
-    Posted by <span class="fn">Alex C. Viana</span>
-  </span>
-<time datetime="2013-12-10T00:00:00" pubdate>2013-12-10</time>  <span class="categories">
-    <a class="category" href="http://acviana.github.io/tag/code.html">code</a>
-    <a class="category" href="http://acviana.github.io/tag/devops.html">devops</a>
-    <a class="category" href="http://acviana.github.io/tag/python.html">python</a>
-  </span>
-</p>    </footer>
-  </article>
-</div>
-<aside class="sidebar">
-  <section>
-    <h1>Recent Posts</h1>
-    <ul id="recent_posts">
-      <li class="post">
-          <a href="http://acviana.github.io/posts/2014/writing-a-fits-file-bigger-than-your-memory/">Writing a FITS File Bigger Than Your Memory</a>
-      </li>
-      <li class="post">
-          <a href="http://acviana.github.io/posts/2014/numpy-arrays-and-sql/">Working with NumPy Arrays and SQL</a>
-      </li>
-      <li class="post">
-          <a href="http://acviana.github.io/posts/2014/fitting-2d-gaussians-with-agpy/">Fitting 2D Gaussians with agpy</a>
-      </li>
-      <li class="post">
-          <a href="http://acviana.github.io/posts/2014/faster-file-checking-with-sets/">Faster File Existence Testing with Sets</a>
-      </li>
-      <li class="post">
-          <a href="http://acviana.github.io/posts/2014/2014-summer-internship-opportunity/">2014 Summer Internship Opportunity</a>
-      </li>
-    </ul>
-  </section>
-  <section>
-      
-    <h1>Categories</h1>
-    <ul id="recent_posts">
-        <li><a href="http://acviana.github.io/category/work.html">Work</a></li>
-    </ul>
-  </section>
- 
+</pre></div>
 
-  <section>
-  <h1>Tags</h1>
-    <a href="http://acviana.github.io/tag/uvis.html">uvis</a>,    <a href="http://acviana.github.io/tag/code.html">code</a>,    <a href="http://acviana.github.io/tag/humor.html">humor</a>,    <a href="http://acviana.github.io/tag/mtpipeline.html">mtpipeline</a>,    <a href="http://acviana.github.io/tag/python.html">python</a>,    <a href="http://acviana.github.io/tag/wfc3.html">wfc3</a>,    <a href="http://acviana.github.io/tag/database.html">database</a>,    <a href="http://acviana.github.io/tag/psf.html">psf</a>,    <a href="http://acviana.github.io/tag/devops.html">devops</a>,    <a href="http://acviana.github.io/tag/wfpc2.html">wfpc2</a>,    <a href="http://acviana.github.io/tag/acs.html">acs</a>,    <a href="http://acviana.github.io/tag/jwst.html">jwst</a>,    <a href="http://acviana.github.io/tag/milestones.html">milestones</a>,    <a href="http://acviana.github.io/tag/hst.html">hst</a>,    <a href="http://acviana.github.io/tag/git.html">git</a>,    <a href="http://acviana.github.io/tag/fits.html">fits</a>,    <a href="http://acviana.github.io/tag/plots.html">plots</a>,    <a href="http://acviana.github.io/tag/pelican.html">pelican</a>  </section>
+		<div id="article_meta">
+				Category:
+					<a href="/category/work.html">Work</a>
+				<br />Tags:
+					<a href="/tag/code.html">code</a>
+					<a href="/tag/devops.html">devops</a>
+					<a href="/tag/python.html">python</a>
+		</div>
+	</article>
+
+	<footer>
+		<a href="/" class="button_accent">&larr;&nbsp;&nbsp;&nbsp;Back to blog</a>
+	</footer>
 
 
-    <section>
-        <h1>Social</h2>
-        <ul>
-            <li><a href="http://acviana.github.io/" type="application/rss+xml" rel="alternate">RSS</a></li>
-            <li><a href="https://twitter.com/AlexVianaPro" target="_blank">Twitter</a></li>
-            <li><a href="https://github.com/acviana" target="_blank">GitHub</a></li>
-            <li><a href="http://www.linkedin.com/pub/alex-viana/49/1b8/83" target="_blank">LinkedIn</a></li>
-            <li><a href="http://stackoverflow.com/users/1216837/acv" target="_blank">StackOverflow</a></li>
-        </ul>
-    </section>
-    <section>
-        <h1>Blogroll</h2>
-        <ul>
-            <li><a href="http://getpelican.com/" target="_blank">Pelican</a></li>
-            <li><a href="http://python.org/" target="_blank">Python.org</a></li>
-            <li><a href="http://jinja.pocoo.org/" target="_blank">Jinja2</a></li>
-            <li><a href="http://software-carpentry.org/" target="_blank">Software Carpentry</a></li>
-        </ul>
-    </section>
-</aside>    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Alex C. Viana -
-  <span class="credit">Powered by <a href="http://getpelican.com">Pelican</a></span>
-</p></footer>
+	</section>
+
 </body>
 </html>
