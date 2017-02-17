@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="/theme/css/style.css">
+	<!--<link rel="stylesheet/less" type="text/css" href="/theme/css/style.less">-->
+	<!--<script src="/theme/js/less.js" type="text/javascript"></script>-->
+	<link rel="stylesheet" type="text/css" href="/theme/css/pygments.css">
+	<link href='//fonts.googleapis.com/css?family=Open+Sans:800,400,300|Inconsolata' rel='stylesheet' type='text/css'>
+
+
+
+		<title>The Other Side of the Screen</title>
+		<meta charset="utf-8" />
+</head>
+<body>
+	<section id="sidebar">
+		<figure id="user_logo">
+            <a href=""><div class="logo">&nbsp;</div></a>
+		</figure>
+
+		<div class="user_meta">
+            <h1 id="user"><a href="" class="">Alex C. Viana</a></h1>
+			<h2></h2>
+			<ul>
+						<li><a href="/pages/about.html">About</a></li>
+					<li><a href="http://getpelican.com/">Pelican</a></li>
+					<li><a href="http://python.org/">Python.org</a></li>
+					<li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+					<li><a href="#">You can modify those links in your config file</a></li>
+			</ul>
+		</div>
+		<footer>
+			<address>
+				Powered by <a href="http://pelican.notmyidea.org/">Pelican</a>,
+		                theme by <a href="https://github.com/wting/pelican-svbtle">wting</a>.
+			</address>
+		</footer>
+	</section>
+
+	<section id="posts">
+	<header>
+		<h1>Alex C. Viana's blog</h1>
+		<h3>Posted Wed 04 December 2013</h3>
+	</header>
+	<article>
+		<h1 id="title">
+			<a href="/that-time-i-made-a-metaclass.html" rel="bookmark"
+				title="Permalink to That Time I Made a Metaclass">That Time I Made a Metaclass</a>
+		</h1>
+		<blockquote>
+<p>"If you don't know what a metaclass is you don't need to use one."<br />
+- David Beazley</p>
+</blockquote>
+<p>I was shooting some messages back and forth this morning with some current and former coworkers on Twitter on the topic of Python Metaclasses. One coworker said metaclasses was something he'd never really got around to using. I mentioned that I had used them exactly once to generate database Object Relational Models (ORMs). My second coworker said that was a common use case and that it would be nice to see an example. Since a tech blog is a shining example of a hammer searching for a nail I immediately got to work on this post.</p>
+<h3>Some Background</h3>
+<p>I took David Beazley's Python Master class in 2009 (?) and I still remembered the quote from the start of this post, so for years I didn't worry about metaclasses because I knew I didn't need them. Finally though, I did need them.</p>
+<p>One of my favorite Python modules, despite its near vertical learning curve, is the <a href="http://www.sqlalchemy.org/">SQLAlchemy</a> database toolkit. One of the features in this module is a very nice Object Relational Mapper (ORM) which maps database tables to Python classes. The ORM can be used in a number of ways and I prefer to use what's called the <a href="http://docs.sqlalchemy.org/en/rel_0_9/orm/extensions/declarative.html">Declarative Base</a> syntax. The basic idea is that you create a parent class called <code>Base</code> that contains information about your database connection and metadata. All your ORM classes are then child classes of <code>Base</code> and you use them to work with your tables. Here is a basic example:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyTable</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Defines a SQLAlchemy ORM&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">init_dict</span><span class="p">)</span>
+
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;my_table&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">foo1</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">foo2</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="n">foo3</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+    <span class="o">...</span>
+</pre></div>
+
+
+<p>You could imagine an application that would need to dynamically define several of these tables, but you don't have to because I'm about to tell you about one. </p>
+<h3>My Problem</h3>
+<p>The most common image file format in astronomy is called <a href="http://en.wikipedia.org/wiki/FITS">FITS</a>. FITS files have multiple layers (called "extensions") each with it's own set of metadata (called "headers"). For one of my projects we have over a million FITS files and we index these files with a MySQL database that maps the header keywords in the extensions to fields in SQL tables. We have about a dozen different file types, each with a handful of extensions, and each of those has 10s of header keywords. If you spelled out every ORM explicitly with a class and an attribute for every column like we do above we would literally have thousands of rows of ORM definitions. I'm a big proponent of the DRY principle (Don't Repeat Yourself) for the sake of readability and maintainability so this was a pretty big red flag in my opinion. </p>
+<h3>My Solution</h3>
+<p>Notice that we don't need to dynamically create many instances of the same class. Instead we need to dynamically create many class definitions. This is the specific need the drove me to use a metaclass.I ended up with something like the code snippet below. </p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">orm_factory</span><span class="p">(</span><span class="n">class_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates SQLA ORM Classes.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_dict</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">init_dict</span><span class="p">)</span>
+
+    <span class="n">class_attributes_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">class_attributes_dict</span><span class="p">[</span><span class="s1">&#39;__init__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">__init__</span>
+    <span class="n">class_attributes_dict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">class_attributes_dict</span><span class="p">[</span><span class="s1">&#39;__tablename__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">class_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="n">s</span>
+    <span class="n">class_attributes_dict</span><span class="o">.</span><span class="n">__update__</span><span class="p">(</span><span class="n">get_column_defs</span><span class="p">(</span><span class="n">class_name</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">class_name</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="p">(</span><span class="n">Base</span><span class="p">,),</span> <span class="n">class_attributes_dict</span><span class="p">)</span>
+</pre></div>
+
+
+<p>You could then call <code>orm_factory</code> like this:</p>
+<div class="highlight"><pre><span></span><span class="n">Class1</span> <span class="o">=</span> <span class="n">orm_factory</span><span class="p">(</span><span class="s1">&#39;Class1&#39;</span><span class="p">)</span>
+<span class="n">Class2</span> <span class="o">=</span> <span class="n">orm_factory</span><span class="p">(</span><span class="s1">&#39;Class2&#39;</span><span class="p">)</span>
+<span class="n">Class3</span> <span class="o">=</span> <span class="n">orm_factory</span><span class="p">(</span><span class="s1">&#39;Class3&#39;</span><span class="p">)</span>
+<span class="o">...</span>
+</pre></div>
+
+
+<p>And there you have your classes, dynamically created using metaclasses.</p>
+<h3>Solution Breakdown</h3>
+<p>Let's walk through this. First, let's look at the last line for the <code>orm_factory</code> function. This is maybe the "craziest" part of the whole function. That's because <code>type</code> is actually a metaclass constructor. That's right, the thing that tells you <code>type(1)</code> is <code>int</code> is also used as a metaclass constructor to maintain backward comparability <sup id="fnref:1"><a class="footnote-ref" href="#fn:1" rel="footnote">1</a></sup>. (If you want to tickle your brain check the type of type). To really wrap your head around metaclasses and type check out Jake VanderPlas's <a href="http://jakevdp.github.io/blog/2012/12/01/a-primer-on-python-metaclasses/">excellent post</a> on the subject. </p>
+<p>The basic idea is you pass <code>type</code> the string name you would to give the constructed class, a tuple of parent classes, and a dictionary of any other attributes for the class. Looking up the code block you'll see that I create a dictionary for these attributes called <code>class_attribute_dict</code>. </p>
+<p>Notice I'm doing a little bit of magic by creating a <code>get_column_defs()</code> function. This function will dynamically add the appropriate column definitions, for example by pulling them from the FITS headers. The implementation of this function isn't import to the topic of this post, what matters is that these is some dynamic aspect to the column definition (and hence the class creation) that necessitates the use of a metaclass. </p>
+<p>Also, notice that the attributes in  <code>class_attribute_dict</code> includes an <code>__init__</code> method defined as a function. This is one of those weird moments in python when you define a function <em>inside</em> of another function. We do this because we're never going to use the <code>__init__</code> function outside of the <code>orm_factory</code> function it's nested in so there is no reason to globally scope it. In this case we define <code>__init__</code> just like it was a method with a reference to <code>self</code> and everything. Even though there is nothing special about this function it will still take on the properties of a method after it's passed to type. I personally think is pretty cool and give you some insight into how classes are built.</p>
+<p>So that's my example of metaclasses. It took me a couple of long days to figure this all out but I learned a lot about the inner workings of Python in the process. It's not so hard once you see it, but it's also not something I anticipate having to do again soon.</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>I swear I read this somewhere but I'm still hunting for the source.&#160;<a class="footnote-backref" href="#fnref:1" rev="footnote" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+
+		<div id="article_meta">
+				Category:
+					<a href="/category/work.html">Work</a>
+				<br />Tags:
+					<a href="/tag/code.html">code</a>
+					<a href="/tag/python.html">python</a>
+					<a href="/tag/database.html">database</a>
+		</div>
+	</article>
+
+	<footer>
+		<a href="/" class="button_accent">&larr;&nbsp;&nbsp;&nbsp;Back to blog</a>
+	</footer>
+
+
+	</section>
+
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="/theme/css/style.css">
+	<!--<link rel="stylesheet/less" type="text/css" href="/theme/css/style.less">-->
+	<!--<script src="/theme/js/less.js" type="text/javascript"></script>-->
+	<link rel="stylesheet" type="text/css" href="/theme/css/pygments.css">
+	<link href='//fonts.googleapis.com/css?family=Open+Sans:800,400,300|Inconsolata' rel='stylesheet' type='text/css'>
+
+
+
+		<title>The Other Side of the Screen</title>
+		<meta charset="utf-8" />
+</head>
+<body>
+	<section id="sidebar">
+		<figure id="user_logo">
+            <a href=""><div class="logo">&nbsp;</div></a>
+		</figure>
+
+		<div class="user_meta">
+            <h1 id="user"><a href="" class="">Alex C. Viana</a></h1>
+			<h2></h2>
+			<ul>
+						<li><a href="/pages/about.html">About</a></li>
+					<li><a href="http://getpelican.com/">Pelican</a></li>
+					<li><a href="http://python.org/">Python.org</a></li>
+					<li><a href="http://jinja.pocoo.org/">Jinja2</a></li>
+					<li><a href="#">You can modify those links in your config file</a></li>
+			</ul>
+		</div>
+		<footer>
+			<address>
+				Powered by <a href="http://pelican.notmyidea.org/">Pelican</a>,
+		                theme by <a href="https://github.com/wting/pelican-svbtle">wting</a>.
+			</address>
+		</footer>
+	</section>
+
+	<section id="posts">
+	<header>
+		<h1>Alex C. Viana's blog</h1>
+		<h3>Posted Tue 10 December 2013</h3>
+	</header>
+	<article>
+		<h1 id="title">
+			<a href="/drafts/a-basic-automation-setup-2.html" rel="bookmark"
+				title="Permalink to A Basic Automation Setup for Astronomy: Part 2">A Basic Automation Setup for Astronomy: Part 2</a>
+		</h1>
+		<h3>Why Log Files?</h3>
+<p>Let's put on our imagining caps. Pretend that you have already set up an automated pipeline like the one I described in the first post in this series (In fact some people already have). One day your boss walks into your office and asks for some details on about something you pipeline made 6 months ago. Maybe they want to know what input files were used. Or what settings and options were used. Or Maybe they want to reproduce a figure. How would you do that? </p>
+<p>Something that I think sometimes gets lost when you start to transfer you work to a more automated work flow is our old friend the lab notebook. For any data products your automation platform produces you should be able to tell someone exactly what inputs were used, what software, and even what version of your software. Ideally, someone should even be able to figure this out for themselves. Log files are a great way to accomplish this type of detailed record keeping, essentially generating an automated lab notebook. Here is an example output from one of my scripts:</p>
+<div class="highlight"><pre><span></span>2013-11-22 10:08:52,719 - INFO - User: jstrummer
+2013-11-22 10:08:52,720 - INFO - Host: casbah
+2013-11-22 10:08:52,745 - INFO - Machine: x86_64
+2013-11-22 10:08:52,747 - INFO - Platform: Linux-2.6.32-358.18.1.el6.x86_64-x86_64-with-redhat-6.4-Santiago
+2013-11-22 10:08:52,747 - INFO - Command-line arguments used:
+2013-11-22 10:08:52,747 - INFO - reproc: False
+2013-11-22 10:08:52,747 - INFO - filelist: /*_saturn/*single_sci.fits
+2013-11-22 10:08:52,820 - INFO - Processing 2722 files.
+2013-11-22 10:08:52,821 - INFO - Now running on u2ona109t_c0m_center_single_sci.fits
+...
+</pre></div>
+
+
+<p>With the command line <code>grep</code> utility you can quickly start to look for trends. If you want to do even more you can explore the Pandas Python package, more on that in a later post. </p>
+<h3>Getting Started with the Python Logger</h3>
+<p>Python has a great <a href="http://docs.python.org/2/library/logging.html">logging</a> module. You can find a basic tutorial <a href="http://docs.python.org/2/howto/logging.html#logging-basic-tutorial">here</a>. There are lots of ways to invoke and setup the Python logger. I usually define a function something like this and import it throughout my project.</p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="k">def</span> <span class="nf">setup_logging</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set up the logging.&quot;&quot;&quot;</span>
+    <span class="n">log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;/my-project/logs/&#39;</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span>
+        <span class="n">module</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">-%H-%M&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.log&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">filename</span> <span class="o">=</span> <span class="n">log_file</span><span class="p">,</span>
+        <span class="n">format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">: </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="n">datefmt</span> <span class="o">=</span> <span class="s1">&#39;%m/</span><span class="si">%d</span><span class="s1">/%Y %H:%M:%S %p&#39;</span><span class="p">,</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+</pre></div>
+
+
+<p>What this does is it will create a separate log directory for each module and the log the outputs in a date-stamped file, e.g. <code>/my-project/logs/my_module/my_module_2013-12-22-15-41.log</code>. Every line in the log file will then begin with a date and time stamp, followed by the level name and then the logging message, similar to the output I showed in the last section. Lastly, I tell it to log all statements down to the "INFO" level.</p>
+<h3>A Logging Recipe</h3>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log_info</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Decorator to log some useful environment information.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+
+        <span class="c1"># Log user, system, and Python metadata</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;User: &#39;</span> <span class="o">+</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">())</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;System: &#39;</span> <span class="o">+</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">())</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Python Version: &#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Python Executable Path: &#39;</span> <span class="o">+</span> <span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">)</span>
+
+        <span class="c1"># Log PyRAF data</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;PyRAF Version: &#39;</span> <span class="o">+</span> <span class="n">pyraf</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;PyRAF Path: &#39;</span> <span class="o">+</span> <span class="n">pyraf</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Call the function and log the execution time.</span>
+        <span class="n">t1_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">a</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+        <span class="n">t2_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">hours_time</span><span class="p">,</span> <span class="n">remainder_time</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">t2_time</span> <span class="o">-</span> <span class="n">t1_time</span><span class="p">,</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">minutes_time</span><span class="p">,</span> <span class="n">seconds_time</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">remainder_time</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Elapsed Real Time: {0:.0f}:{1:.0f}:{2:f}&#39;</span><span class="o">.</span>\
+            <span class="n">format</span><span class="p">(</span><span class="n">hours_time</span><span class="p">,</span> <span class="n">minutes_time</span><span class="p">,</span> <span class="n">seconds_time</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">wrapped</span>
+</pre></div>
+
+
+<p>You script would then looks like this:</p>
+<div class="highlight"><pre><span></span><span class="nd">@log_info</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;My main function.&quot;&quot;&quot;</span>
+    <span class="n">make_science</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+		<div id="article_meta">
+				Category:
+					<a href="/category/work.html">Work</a>
+				<br />Tags:
+					<a href="/tag/code.html">code</a>
+					<a href="/tag/devops.html">devops</a>
+					<a href="/tag/python.html">python</a>
+		</div>
+	</article>
+
+	<footer>
+		<a href="/" class="button_accent">&larr;&nbsp;&nbsp;&nbsp;Back to blog</a>
+	</footer>
+
+
+	</section>
+
+</body>
+</html>
