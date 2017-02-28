@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" type="text/css" href="/theme/css/style.css">
+	<!--<link rel="stylesheet/less" type="text/css" href="/theme/css/style.less">-->
+	<!--<script src="/theme/js/less.js" type="text/javascript"></script>-->
+	<link rel="stylesheet" type="text/css" href="/theme/css/pygments.css">
+	<link href='//fonts.googleapis.com/css?family=Open+Sans:800,400,300|Inconsolata' rel='stylesheet' type='text/css'>
+
+
+
+		<title>The Other Side of the Screen</title>
+		<meta charset="utf-8" />
+</head>
+<body>
+	<section id="sidebar">
+		<figure id="user_logo">
+            <a href=""><div class="logo">&nbsp;</div></a>
+		</figure>
+
+		<div class="user_meta">
+            <h1 id="user"><a href="" class="">Alex C. Viana</a></h1>
+			<h2></h2>
+			<ul>
+						<li><a href="/pages/about.html">About</a></li>
+					<li><a href="https://twitter.com/alexvianapro">Twitter</a></li>
+					<li><a href="https://www.linkedin.com/in/alex-viana-0831b849">LinkedIn</a></li>
+			</ul>
+		</div>
+		<footer>
+			<address>
+				Powered by <a href="http://pelican.notmyidea.org/">Pelican</a>,
+		                theme by <a href="https://github.com/wting/pelican-svbtle">wting</a>.
+			</address>
+		</footer>
+	</section>
+
+	<section id="posts">
+	<header>
+		<h1>Alex C. Viana's blog</h1>
+		<h3>Posted Fri 17 February 2017</h3>
+	</header>
+	<article>
+		<h1 id="title">
+			<a href="/drafts/exploring-pythons-in-operator.html" rel="bookmark"
+				title="Permalink to Exploring Python's 'in' operator">Exploring Python's 'in' operator</a>
+		</h1>
+		<p>I spent 12 hours on a plane this week traveling between the East Coast and San Fransisco for the RSA conference. I've appreciated the way flying forces me to disconnect and spend a little bit more time on side projects such as this blog. On this particular flight picked up an idea I've been wanting to play with for a while, overloading Python's special object methods.</p>
+<h3>Magic Methods</h3>
+<p>These are the object methods that begin with a double underscore such as <code>__init__</code> and are also known as "magic", "double-underscore", or "dunder" methods. These methods define a lot of the inherent behavior of Python objects, including the Python built-ins such as lists and dictionaries. These methods also define how objects interact with operators such as <code>+</code> (the <code>__add__</code> method) and <code>&lt;=</code> (the <code>__leq__</code> operator).</p>
+<p>Because so much of how Python works is wrapped up in these method I figured messing with them would be a good way to gain a deeper understanding of the language. So I started making little toy classes that implemented these methods in weird ways and everything was going as I expected until I got to the <code>__contains__</code> method. The <code>__contains__</code> method is the method used to check membership using the <code>in</code> operator. For example:</p>
+<div class="highlight"><pre><span></span>In [1]: &#39;foo&#39; in [&#39;foo&#39;, &#39;bar&#39;]
+Out[1]: True
+
+In [2]: [&#39;foo&#39;, &#39;bar&#39;].__contains__(&#39;foo&#39;)
+Out[2]: True
+
+In [3]: 1 in [&#39;foo&#39;, &#39;bar&#39;]
+Out[3]: False
+
+In [4]: [&#39;foo&#39;, &#39;bar&#39;].__contains__(1)
+Out[4]: False
+</pre></div>
+
+
+<p>In each case the <code>__contains__</code> method of Python's built-in list object is being called to evaluate the <code>in</code> operator. As it turns out this is an over simplification. I realized this when I took my first pass at building my own <code>__contains__</code> method and I did something a little weird:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="n">MyObject</span>(<span class="n">object</span>):
+
+    <span class="n">def</span> <span class="n">__contains__</span>(<span class="k">self</span>, <span class="n">y</span>):
+        <span class="k">return</span> <span class="s">&#39;__contains__&#39;</span>
+</pre></div>
+
+
+<p>This is a non-sense method, returning a string instead of a Boolean is unexpected behavior and doesn't make sense in the context of evaluating an object membership. But I just figured it would always evaluate to <code>False</code>. A little more exploration showed that there was something special about the <code>in</code> operator.</p>
+<div class="highlight"><pre><span></span>In [1]: mo = MyObject()
+
+In [2]: mo.__contains__(1)
+Out[2]: &#39;__contains__&#39;
+
+In [3]: mo.__contains__(1) == True
+Out[3]: False
+
+In [4]: 1 in mo
+Out[4]: True
+</pre></div>
+
+
+<p>I was expecting <code>1 in mo</code> to evaluate to something like <code>mo.__contains__(1) == True</code> which evaluates to <code>__contains__ == True</code> which should be <code>False</code>. Instead I'm got <code>True</code>, so there was something I didn't understand going on.</p>
+<p>A little but of searching on StackOverflow led me to <a href="http://stackoverflow.com/a/18753584/1216837">this hint</a>:</p>
+<blockquote>
+<p>First, <code>in</code> always casts the result of <code>__contains__</code> to a bool</p>
+</blockquote>
+<p>So this answers my question but doesn't really teach me much more about Python. This is the beauty about being on a plane. Normally, if I ran into something like this at work I would just take this answer at face value and moved on. But instead being stuck on a plane I had the time and incentive to go a little further down rabbit hole and read the cpython source.</p>
+<h3>Reading the Source</h3>
+<p>I've only looked at the <a href="https://github.com/python/cpython/tree/2.7">cpython source code</a> a few times before this. I've never written a line of C in my life but I've been programming long enough that I can kind of squint and make out the flow of most things.</p>
+<p>It didn't take me too long to get oriented enough to find an example of how the <code>__contains__</code> object is <a href="https://github.com/python/cpython/blob/2.7/Objects/listobject.c#L438">implemented</a> in an function called <code>list_contains</code> in the <code>listobject.c</code> file. This function iterates over the object contents calling the c <a href="https://github.com/python/cpython/blob/6f0eb93183519024cb360162bdd81b9faec97ba6/Objects/object.c#L727">function</a> on each one.</p>
+<p>The comment on the <code>PyObject_RichCompareBool</code> function reads:</p>
+<blockquote>
+<p>/<em> Perform a rich comparison with integer result.  This wraps
+   PyObject_RichCompare(), returning -1 for error, 0 for false, 1 for true. </em>/</p>
+</blockquote>
+<p>OK so our casting as of everything as a boolean must happen in here. Digging in a little more this function drops down into the <code>PyObject_IsTrue</code> <a href="https://github.com/python/cpython/blob/6f0eb93183519024cb360162bdd81b9faec97ba6/Objects/object.c#L1314">function</a>. And here we finally have our answer. <code>PyObject_IsTrue</code> checks if the input is <code>True</code>, <code>False</code>, <code>None</code> and then a handful of sequence types. If none of these are true the function returns <code>1</code>, which cascades up to <code>__contains__</code> and is then interpreted as <code>True</code>.</p>
+
+		<div id="article_meta">
+				Category:
+					<a href="/category/python.html">Python</a>
+				<br />Tags:
+					<a href="/tag/python.html">python</a>
+		</div>
+	</article>
+
+	<footer>
+		<a href="/" class="button_accent">&larr;&nbsp;&nbsp;&nbsp;Back to blog</a>
+	</footer>
+
+
+	</section>
+
+</body>
+</html>
