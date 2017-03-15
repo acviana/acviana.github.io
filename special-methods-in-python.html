@@ -42,17 +42,20 @@
 	</header>
 	<article>
 		<h1 id="title">
-			<a href="/drafts/special-methods-in-python.html" rel="bookmark"
+			<a href="/special-methods-in-python.html" rel="bookmark"
 				title="Permalink to Special Methods in Python">Special Methods in Python</a>
 		</h1>
 		<p><em>This post is intended to accompany a presentation I gave to the <a href="https://www.meetup.com/baltimore-python/events/238058777/">Baltimore Python Meetup</a> on Wednesday, March 15th 2017.</em></p>
-<p><em>This post assumes some familiarity object-oriented programming as it relates to classes and inheritance in Python.</em></p>
+<p><em>This post assumes some familiarity with object-oriented programming as it relates to classes and inheritance in Python.</em></p>
 <p>The purpose of this post is to explore Python's <a href="https://docs.python.org/3/reference/datamodel.html#special-method-names">special methods</a>, also called "magic", "built-in", "double underscore", or "dunder" methods. A common example is the <code>__init__</code> method. These methods are considered special because they are referenced by Python to determine class behavior. Note that the double underscore notation is just a naming convention for indicating which methods Python considers special. Adding a double underscore to any other method (e.g. <code>__foo__</code>) doesn't give it any special properties.</p>
 <h3>Special Methods</h3>
 <p>To explore how these methods work we're going to pretend we're building a Scrabble-type game. A natural object for this type of project would be an object that encapsulates a word and it's score. Let's start with a super basic class:</p>
-<div class="highlight"><pre><span></span>In [1]: my_word = ScrabbleWord()
-In [2]: my_word.word = &#39;cat&#39;
-In [3]: my_word.score = 5
+<div class="highlight"><pre><span></span>In [1]: class ScrabbleWord():
+    ...:     pass
+    ...:
+In [2]: my_word = ScrabbleWord()
+In [3]: my_word.word = &#39;cat&#39;
+In [4]: my_word.score = 5
 </pre></div>
 
 
@@ -110,7 +113,7 @@ Out[2]: &lt;__main__.ScrabbleWord instance at 0x1084c80e0&gt;
 </pre></div>
 
 
-<p>This tells us that the <code>my_word</code> object is an instance of the <code>ScrabbleWord</code> class from the <code>__main__</code> namespace and is located at memory address <code>0x1084c80e0</code>. While this is all correct it's the default representation of any Python object and that information is not as useful as it could be for building out Scrabble game</p>
+<p>This tells us that the <code>my_word</code> object is an instance of the <code>ScrabbleWord</code> class from the <code>__main__</code> namespace and is located at memory address <code>0x1084c80e0</code>. While this is all correct it's the default representation of any Python object and that information is not as useful as it could be for building our Scrabble game</p>
 <p>We can make the results more descriptive by overloading the <code>__repr__</code> and <code>__str__</code> methods to fit our use case. This could look like this.</p>
 <div class="highlight"><pre><span></span>def __repr__(self):
     return &#39;{}: {} points&#39;.format(self.word, self.score)
@@ -150,7 +153,7 @@ Out[6]: False
 </pre></div>
 
 
-<p>If we start to implicitly compare the words Python doesn't know we mean to compare the score and we get unexpected behavior.</p>
+<p>But if we start to implicitly compare the words Python doesn't know we mean to compare the score and we get unexpected behavior.</p>
 <div class="highlight"><pre><span></span>In [5]: cat_word == dog_word
 Out[5]: False
 
@@ -222,7 +225,7 @@ Out[6]: True
 <p>It's worth pointing out what's happening here. Taking the <code>__eq__</code> method as an example. Where Python sees the <code>==</code> operator between two instance of our <code>ScrabbleWords</code> class it'll evaluate the <code>__eq__</code> method to determine the result.</p>
 <p>But looking at our code and you can see the comparison being performed is <code>self.score == y.score</code> which is something like <code>&lt;int&gt; == &lt;int&gt;</code>. So what determines the answer of <em>that</em> statement? Because everything in python is an object, including integers, Python uses the integer classes <code>__eq__</code> method to evaluate this.</p>
 <h3>The __iter__ and __len__ and Methods</h3>
-<p>So when we play a word on the board in Scrabble we might care about how long a word is (to see if it'll fit on the board) and we might need to look at a word letter by letter (to evaluate things like bonus letter scores). If we try to do either of these things with out class in it's current state we'll see neither are not supported.</p>
+<p>When we play a word on the board in Scrabble we might care about how long a word is (to see if it'll fit on the board) and we might need to look at a word letter-by-letter (to evaluate things like bonus letter scores). If we try to do either of these things with Our class in it's current state we'll see neither are not supported.</p>
 <div class="highlight"><pre><span></span>In [1]: len(cat_word)
 ---------------------------------------------------------------------------
 AttributeError                            Traceback (most recent call last)
@@ -250,7 +253,7 @@ Out[2]: [&#39;c&#39;, &#39;a&#39;, &#39;t&#39;]
 </pre></div>
 
 
-<p>But, again, we do this implicitly with the special methods, in this case the <code>__len__</code> and <code>__iter__</code> methods.</p>
+<p>But, following the theme of this post, we can do this implicitly with the special methods, in this case the <code>__len__</code> and <code>__iter__</code> methods.</p>
 <div class="highlight"><pre><span></span>def __iter__(self):
     for letter in self.word:
         yield letter
@@ -260,7 +263,7 @@ def __len__(self):
 </pre></div>
 
 
-<p>Now we out class looks works like this:</p>
+<p>Now our class works like this:</p>
 <div class="highlight"><pre><span></span>In [43]: len(cat_word)
 Out[43]: 3
 
@@ -270,7 +273,7 @@ Out[44]: [&#39;c&#39;, &#39;a&#39;, &#39;t&#39;]
 
 
 <h3>Conclusion</h3>
-<p>Python special methods become increasingly important as you start working on more involved projects. Either you will be writing your own libraries. in which case these are common "pythonic" programming patterns. Or even if you are leveraging existing libraries, at some point you will need to understand exactly what some special methods are doing in order to understanding some bug or quirk in the library.</p>
+<p>Python special methods become increasingly important as you start working on more involved projects. Either you will be writing your own libraries, in which case these are common "pythonic" programming patterns. Or even if you are leveraging existing libraries, at some point you will need to understand exactly what some special methods are doing in order to understanding some bug or quirk in the library.</p>
 <p>Just doing some quick poking around on the github repos for some of my favorite open source projects turns up a couple of examples of classes with lots of special methods in the wild: <a href="https://github.com/zzzeek/sqlalchemy/blob/master/lib/sqlalchemy/engine/result.py#L42">BaseRowProxy</a> in SQLAlchemy, <a href="https://github.com/astropy/astropy/blob/master/astropy/coordinates/sites.py#L26">SiteRegistry</a> in Astropy.</p>
 <div class="footnote">
 <hr />
