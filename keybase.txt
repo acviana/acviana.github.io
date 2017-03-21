@@ -1,0 +1,54 @@
+==================================================================
+https://keybase.io/acv
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://acviana.github.io
+  * I am acv (https://keybase.io/acv) on keybase.
+  * I have a public key ASARGh9PzYhkW7ifTJAzViwVjjlHNXkPKGOIS5vBgON-fgo
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "eldest_kid": "0120111a1f4fcd88645bb89f4c9033562c158e394735790f2863884b9bc180e37e7e0a",
+            "host": "keybase.io",
+            "kid": "0120111a1f4fcd88645bb89f4c9033562c158e394735790f2863884b9bc180e37e7e0a",
+            "uid": "f4e2ddeae5016d6b44555df8b2ad2219",
+            "username": "acv"
+        },
+        "service": {
+            "hostname": "acviana.github.io",
+            "protocol": "https:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "client": {
+        "name": "keybase.io go client",
+        "version": "1.0.20"
+    },
+    "ctime": 1490055275,
+    "expire_in": 504576000,
+    "merkle_root": {
+        "ctime": 1490055241,
+        "hash": "9374f65e498035bc06a8d3e301baa00acf11834dd8b300ce3545b0df419764a98d1546f5651575c26672e7940bffb67f29f65fc59b130378e0362238977dae93",
+        "seqno": 969777
+    },
+    "prev": "c0e2e1c1302ffdb82903ee508f425562cbc0df8ba1c5fb66a11a7a68927125cf",
+    "seqno": 15,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEgERofT82IZFu4n0yQM1YsFY45RzV5DyhjiEubwYDjfn4Kp3BheWxvYWTFAvV7ImJvZHkiOnsia2V5Ijp7ImVsZGVzdF9raWQiOiIwMTIwMTExYTFmNGZjZDg4NjQ1YmI4OWY0YzkwMzM1NjJjMTU4ZTM5NDczNTc5MGYyODYzODg0YjliYzE4MGUzN2U3ZTBhIiwiaG9zdCI6ImtleWJhc2UuaW8iLCJraWQiOiIwMTIwMTExYTFmNGZjZDg4NjQ1YmI4OWY0YzkwMzM1NjJjMTU4ZTM5NDczNTc5MGYyODYzODg0YjliYzE4MGUzN2U3ZTBhIiwidWlkIjoiZjRlMmRkZWFlNTAxNmQ2YjQ0NTU1ZGY4YjJhZDIyMTkiLCJ1c2VybmFtZSI6ImFjdiJ9LCJzZXJ2aWNlIjp7Imhvc3RuYW1lIjoiYWN2aWFuYS5naXRodWIuaW8iLCJwcm90b2NvbCI6Imh0dHBzOiJ9LCJ0eXBlIjoid2ViX3NlcnZpY2VfYmluZGluZyIsInZlcnNpb24iOjF9LCJjbGllbnQiOnsibmFtZSI6ImtleWJhc2UuaW8gZ28gY2xpZW50IiwidmVyc2lvbiI6IjEuMC4yMCJ9LCJjdGltZSI6MTQ5MDA1NTI3NSwiZXhwaXJlX2luIjo1MDQ1NzYwMDAsIm1lcmtsZV9yb290Ijp7ImN0aW1lIjoxNDkwMDU1MjQxLCJoYXNoIjoiOTM3NGY2NWU0OTgwMzViYzA2YThkM2UzMDFiYWEwMGFjZjExODM0ZGQ4YjMwMGNlMzU0NWIwZGY0MTk3NjRhOThkMTU0NmY1NjUxNTc1YzI2NjcyZTc5NDBiZmZiNjdmMjlmNjVmYzU5YjEzMDM3OGUwMzYyMjM4OTc3ZGFlOTMiLCJzZXFubyI6OTY5Nzc3fSwicHJldiI6ImMwZTJlMWMxMzAyZmZkYjgyOTAzZWU1MDhmNDI1NTYyY2JjMGRmOGJhMWM1ZmI2NmExMWE3YTY4OTI3MTI1Y2YiLCJzZXFubyI6MTUsInRhZyI6InNpZ25hdHVyZSJ9o3NpZ8RAqae8AusXw90zPOn/4+DW6GyDGRazu8I0LwAaV92GEDO8LrmE92zWJsUitjIPPO4E3FfXmSP5tKWo337s50S/CqhzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEICacMPyltgXqqrrqxjCh0UFUPp339UihWpc6nUe9Tn7lo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/acv
+
+==================================================================
